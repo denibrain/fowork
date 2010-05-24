@@ -1,0 +1,5 @@
+1.
+DataSet - develop cache SQL queries
+
+
+SELECT @F+ FROM @T+ WHERE @W+ GROUP BY @G+ ORDER BY @O+ LIMIT @L OFFSET @O

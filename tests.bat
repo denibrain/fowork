@@ -1,0 +1,1 @@
+w:/run/php/phpunit.bat tests 

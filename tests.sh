@@ -1,0 +1,1 @@
+w:/run/php/phpunit --colors w:/solutions/fwork/tests/

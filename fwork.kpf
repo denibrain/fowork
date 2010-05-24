@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="c0e40aae-791c-4f86-9d8b-f9b7b5799ba9" kpf_version="4" name="fwork.kpf">
+<livefolder id="c0e40aae-791c-4f86-9d8b-f9b7b5799ba9/lib/web/modules/stx" idref="c0e40aae-791c-4f86-9d8b-f9b7b5799ba9/lib/web/modules" name="stx" url="lib/web/stx">
+</livefolder>
+<preference-set idref="c0e40aae-791c-4f86-9d8b-f9b7b5799ba9">
+  <boolean id="import_live">1</boolean>
+</preference-set>
+</project>

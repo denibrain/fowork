@@ -1,0 +1,67 @@
+regular
+`..` - true text
+<..> - tag
+
+<script> ::= <command> | <text>
+
+<text> ::= ( [^{] | \{ | \\ )*
+
+<command> ::= <if> | <else> | <elsif> | <import> | <for> | <var> | <setvar> | <pre> | <fmt> | <enum> | <defs> | <props>
+
+<if> ::= {? <exp> [:\n]  <script> }
+
+<else> ::= {e <script> }
+
+<elsif> ::= {e? <script> }
+
+<import> ::= {i <name> }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Conditions
+
+{? image!=''
+	<img src="{image}" alt="" />
+}
+{e
+	<img src="noimage.gif" alt="" />
+}
+
+
+Cycles
+
+{@ cart/item
+	<tr>
+		<td>{amount}</td>
+		<td>{%.2f price}</td>
+		<td>{%.2f amount * price}</td>
+	</tr>
+}
+
+Import
+
+to import form.tpl
+
+{i form}
+
+Var
+
+{$total = 0}
+{@ cart/item: 
+	{$total += {cart/item/price}}
+}
