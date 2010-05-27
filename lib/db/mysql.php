@@ -10,9 +10,14 @@ class EMySQL extends EDB {
 // !mportant in safe mode new link is ignored
 class MySQL extends DB {
 
-    public function __construct($dbname = 'test', $dbprefix = '', $user = 'root', $pass = '', 
-		$host = 'localhost', $port = 3306) {
-        parent::__construct($dbname, $dbprefix, $user, $pass,  $host, $port);
+    public function __construct() {
+        parent::__construct();
+		
+		$this->dbname = 'test';
+		$this->user = 'root';
+		$this->pass = '';
+		$this->host = 'localhost';
+		$this->port = 3306;
 
 		$this->queryClass = 'FW\MySQLQuery';
 		

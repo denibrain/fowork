@@ -34,7 +34,7 @@ class FormButton extends FormElement {
 	
 	private $caption;
 	private $name;
-	private $type = 'button';
+	protected $type = 'button';
 	
 	function __construct($caption, $name = '') {
 		$this->caption = $caption;
@@ -48,17 +48,35 @@ class FormButton extends FormElement {
 			'name', $this->name
 		));
 	}
+	
+	function __get($key) {
+		switch ($key) {
+			case 'name': return $this->name;
+			case 'type': return $this->type;
+			default:
+				return parent::__get($key);
+		}
+	}
 }
 
 class FBSubmit extends FormButton {
 	function __construct($caption = 'отправить', $name = '') {
 		parent::__construct($caption, $name);
+		$this->type = 'submit';
 	}
 }
 
-class FSReset extends FormButton {
+class FBReset extends FormButton {
 	function __construct($caption = 'очистить', $name = '') {
 		parent::__construct($caption, $name);
+		$this->type = 'reset';
+	}
+}
+
+class FBCancel extends FormButton {
+	function __construct($caption = 'отмена', $name = '') {
+		parent::__construct($caption, $name);
+		$this->type = 'cancel';
 	}
 }
 
@@ -181,7 +199,7 @@ class FFCheckbox extends FormField {
 
 	public function __construct($name, $caption, $req = FW_FF_NOREQUIRE,
 								$comment = '', $defValue = 0) {
-		parent::__construct($name, $caption, $req, $comment, (int)(!!$value));
+		parent::__construct($name, $caption, $req, $comment, (int)(!!$defValue));
 	}
 	
 	function validate($value) {}

@@ -78,12 +78,20 @@ class User extends \FW\Web\Module {
 			'login', $this->id, 'pass', $this->passhash($pass)))->get();
 	}
 	
-	function login($form) {
+	function create($name, $pass, $email, $type) {
+		return $this->dpCreate($name, $this->passhash($pass), $email, $type);
+	}
+	
+	function onLogin($form) {
 		$values = $form->getValues();
 		$params['login'] = (int)substr($values['uid'], 1);
 		$params['type'] = substr($values['uid'], 0, 1);
-		$params['pass'] = $this->passhash($values['pass']);
-
+		$params['pass'] = $values['pass'];
+		$this->login($params);
+	}
+	
+	function login($params) {
+		$params['pass'] = $this->passhash($params['pass']);
 		if (!($userinfo = $this->dsLogin($params)->get()))
 			throw new EFormUser('— указаными данными пользователь не найден');
 

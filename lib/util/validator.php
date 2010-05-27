@@ -9,7 +9,7 @@ define('RE_WWW', '(?:https?://)?(?:www[.])'.RE_DOMAIN);
 define('RE_MAILBOX', '[a-z0-9](?:[._-]?[a-z0-9])*@'.RE_DOMAIN);
 define('RE_MAILBOXES', "(?:".RE_MAILBOX."; ?)*".RE_MAILBOX);
 define('RE_PHONE', '(?:[+0][0-9]{1,4}\s+)?(?:\([0-9]{1,7}\)\s*)?[ 0-9-]{3,}');
-define('RE_PHONES', "(?:".RE_PHONE.";\s*)*".RE_PHONE);
+define('RE_PHONES', "(?:".RE_PHONE."[;,]\s*)*".RE_PHONE);
 define('RE_IPNO', '2(?:[0-4][0-9]|5[0-5])|1?[0-9]{2}');
 define('RE_IP', '(?:'.RE_IPNO.')(?:\.(?:'.RE_IPNO.')){3}');
 define('RE_NAME', '[a-zA-Z0-9_.-]+');

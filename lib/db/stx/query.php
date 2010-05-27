@@ -1,5 +1,5 @@
 <?php
-$dnm = "[a-z][.a-z0-9_-]+";
+$dnm = "[a-z][.a-z0-9_-]*";
 
 /* this verison of PostgesSQL */
 
@@ -11,6 +11,9 @@ $this->terms = array(
 	'case'  => '\(\?',
     'deq'   => '==',
     'arrow' => '=>',
+	'open2a' => '\+\[',
+	'open2b' => '~\[',
+	'open2c' => '@\[',
     'else'  => '\belse\b',
 	'cond'	=> '\?',
 	'op2'	=> '\b(?:like|in|or|and|xor|between|from|is)\b',
@@ -32,9 +35,6 @@ $this->terms = array(
 	'close' => '\)',
 	'open2' => '\[',
 	'close2'=> '\]',
-	'open2a' => '\+\[',
-	'open2b' => '~\[',
-	'open2c' => '@\[',
 	'dist' => '!',
 	'space' => '\s+',
 	'str1'	=> '\'(?:\\\\.|[^\'])*\'', # STRINGS 
@@ -92,6 +92,7 @@ $this->maps['func']['begin']['close'] = '-';
 $this->maps['where'] = array(
 	'begin'		=> $op, 
 	'operator'	=> $op,
+	'cond'		=> $op, 
 	'unop' 		=> $unop,
 	'arg'		=> array('close2'=>'-', 'op,unop,op2'=>'operator', 'alias'=>'alias')
 );

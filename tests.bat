@@ -1,1 +1,1 @@
-w:/run/php/phpunit.bat tests 
+w:/run/php/phpunit.bat --include-path w:/solutions/fwork/lib tests

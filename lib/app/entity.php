@@ -8,6 +8,7 @@ class Entity extends \FW\Object {
 	
 	protected $dataset;
 	protected $procedure;
+	protected $config;
 
 	public function __construct() {
 		$this->app = App::$instance;
@@ -16,6 +17,8 @@ class Entity extends \FW\Object {
 		
 		$self = $this;
 		$f = FW_PTH_APP."/db/{$this->classname}.db.php";
+		if (file_exists($f)) include $f;
+		$f = FW_PTH_ETC."{$this->classname}.cfg.php";
 		if (file_exists($f)) include $f;
 	}
 	

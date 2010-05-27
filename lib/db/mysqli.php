@@ -9,8 +9,14 @@ class DBMySQLiException extends DBException {
 
 class DBMySQLi extends DB {
 
-    public function __construct($dbname = 'test', $dbprefix = '', $user = 'root', $pass = '',  $host = 'localhost', $port = 3306) {
-        parent::__construct($dbname, $dbprefix, $user, $pass,  $host, $port);
+    public function __construct() {
+        parent::__construct();
+		$this->dbname = 'test';
+		$this->user = 'root';
+		$this->pass = '';
+		$this->host = 'localhost';
+		$this->port = 3306;
+		
         if (false===$this->handle = mysqli_connect($host, $user, $host, $dbname, $port))
             throw new DBException("Cannot connect DB to $host");
     }

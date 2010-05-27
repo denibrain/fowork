@@ -1,45 +1,29 @@
 <?php
 namespace FW\DB;
 
-class PgSQLException extends EDB {
-	public function __construct($link) {
-		parent::__construct(pg_last_error($link));
-	}
-}
-
 // !mportant in safe mode new link is ignored
 class PgSQL extends DB {
 
-    public function __construct($dbname = 'test', $dbprefix = '', $user = 'root', $pass = '', 
-		$host = 'localhost', $port = 5432, $path) {
-        parent::__construct($dbname, $dbprefix, $user, $pass,  $host, $port, $path);
+    public function __construct() {
+        parent::__construct();
 
-		if (!$port) $port = 5432;
-		
+		$this->user = 'postgres';
+		$this->port = 5432;
 		$this->queryClass = 'FW\DB\PgSQLQuery';
-        if (false===($this->handle = \pg_connect("dbname=$dbname host=$host port=$port user=$user password=$pass")))
+	}
+	
+	function open() {
+		parent::open();
+        if (false===($this->handle = \pg_connect("dbname=$this->dbname host=$this->host port=$this->port user=$this->user password=$this->pass")))
             throw new EDB("Cannot connect DB to $host");
 			
 		\pg_query("SET NAMES '".FW_CHARSET."'");
+		$this->connected = true;
 	}
-	
-    function __destruct() {
+
+	function close() {
         pg_close($this->handle);
-    }
-	
-	public function transaction() {
-        $queries = func_get_args();
-		$this->execute("BEGIN");
-		foreach($queries as $query) {
-			try {
-				$this->execute($queries); 
-			}
-			catch (Exception $e) {
-				$this->execute("ROLLBACK");
-				throw $e;
-			}
-		}
-		$this->execute("COMMIT");
+		$this->connected = false;
 	}
 	
 	function begin() {
@@ -80,4 +64,11 @@ class PgSQLQuery extends Query {
 		$d = \pg_fetch_row($this->handle);
 		return $d ? current($d) : false; }
 }
+
+class PgSQLException extends EDB {
+	public function __construct($link) {
+		parent::__construct(pg_last_error($link));
+	}
+}
+
 ?>

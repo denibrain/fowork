@@ -1,26 +1,26 @@
 <?php
 namespace FW\DB;
 
-class EDB extends \Exception {
-	function __construct($message, $code = 2) {
-		parent::__construct($message, $code);
-	}
-}
-
-
 class DB extends \FW\Object {
 	protected $handle;
 	protected $prefix;
 	protected $queryClass;
 	protected $relations;
 	protected $quoteChar = '"';
-	private $path;
+	private $path = 'db/';
+	
+	protected $port = 0;
+	protected $host = 'localhost';
+	protected $user = 'guest';
+	protected $pass = '';
+	protected $dbname = 'test';
+	protected $connected = false;
 
 	/*
 	connection string : mysql://user:pass@host/database#tableprefix;
 	@return: DB
 	*/
-	static function connect($connectionString = FW_DB, $pathDB = '') {
+	static function connect($connectionString = FW_DB) {
 		$url = @parse_url($connectionString);
 		if (!$url && !preg_match('/^[a-z0-9]+$', $url['scheme'])) {
 			throw new EDB("Invalid connecton string");
@@ -36,14 +36,16 @@ class DB extends \FW\Object {
 		if (!preg_match('/^[a-z0-9-_]+$/', $dbname)) {
 			throw new EDB("Invalid Database name");
 		}
-		$provider = new $class(
-			$dbname, 
-			isset($url['fragment'])?$url['fragment']:'', 
-			isset($url['user'])?$url['user']:'', 
-			isset($url['pass'])?$url['pass']:'', 
-			isset($url['host'])?$url['host']:'localhost', 
-			isset($url['port'])?$url['port']:0,
-			$pathDB);
+		$provider = new $class();
+		
+		$provider->dbname = $dbname;
+		if(isset($url['fragment'])) $provider->prefix = $url['fragment'];
+		if(isset($url['user'])) $provider->user = $url['user'];
+		if(isset($url['pass'])) $provider->pass = $url['pass'];
+		if(isset($url['host'])) $provider->host = $url['host']; 
+		if(isset($url['port'])) $provider->port = $url['port'];
+
+		$provider->open();
 		return $provider;
 	}
 	
@@ -86,10 +88,26 @@ class DB extends \FW\Object {
 		return $q.$q;
 	}
 	
-	public function __construct($dbname, $dbprefix, $user, $pass, $host, $port, $path) {
-		$this->path = $path;
-		$this->prefix = $dbprefix;
-		if (file_exists($f = $path.'relations.php')) include $f;
+	public function __construct() {
+		$this->path = defined('FW_PTH_DB') ? FW_PTH_DB : 'db/';
+		$this->prefix = '';
+		$this->host = 'localhost';
+		$this->user = 'guest';
+		$this->pass = '';
+		$this->port = 0;
+		$this->connected = false;
+	}
+	
+    function __destruct() {
+		if ($this->connected) $this->close();
+    }
+	
+	public function open() {
+		if (file_exists($f = $this->path.'relations.php')) include $f;
+	}
+	
+	public function close() {
+		
 	}
 	
 	public function __get($key) {
@@ -158,51 +176,9 @@ class DB extends \FW\Object {
 	public function commit() {}
 }
 
-class Query implements \Iterator {
-	protected $db;
-	protected $handle = false;
-	protected $row = 0;
-	protected $data = array();
-
-	public function __construct(DB $db, $query) {
-		$this->row = 0;
-		$this->db = $db;
+class EDB extends \Exception {
+	function __construct($message, $code = 2) {
+		parent::__construct($message, $code);
 	}
-
-	public function key() { return $this->row; }
-	public function valid() { return false !== ($this->data = $this->getA());}
-	public function rewind() { if ($this->row) $this->seek(0); }
-	public function next() { $this->row++; }
-	public function current() { return $this->data; }
-
-	public function dic() {
-		$list = array();
-		while (list($key, $value) = $this->get()) $list[$key] = $value;
-		return $list;
-	}
-
-	public function lst() {
-		$list = array();
-		while (list($value) = $this->get()) $list[] = $value;
-		return $list;
-	}
-	
-	public function items($mixed = '', $itemName = 'item', $mapper = NULL) {
-		$c = 'FW\Text\Element';
-		if ($mixed instanceof $c) $e = $mixed; else $e = E($mixed);
-		if (isset($mapper))
-		foreach($this as $item) $mapper($e->add(E($itemName, $item)));
-		else 
-		foreach($this as $item) $e->add(E($itemName, $item));
-		return $e;
-	}
-
-	// abstract methods
-	public function val() {}
-	public function seek($row = 0) {}
-	public function getA() {}
-	public function get() {}
-	public function count() {}
-	public function id() {}
 }
 ?>

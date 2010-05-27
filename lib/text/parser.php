@@ -79,7 +79,6 @@ class Parser extends \FW\Object {
 			}
 		}
 	}
-	
 	function compile($text, $callback) {
 		$this->text = $text;
 		$this->callback = $callback;

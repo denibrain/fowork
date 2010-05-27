@@ -1,5 +1,5 @@
 <?php 
-namespace FW;
+namespace FW\Util;
 
 class Password extneds Object {
 	private $code = '';

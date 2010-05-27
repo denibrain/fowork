@@ -25,30 +25,44 @@ class App extends \FW\Object {
 		self::$instance = $this;
 
 		define('FW_ROOT', $root ? $root : $this->approot);
-		define('FW_PTH_ETC', FW_ROOT.'etc/');
-		define('FW_PTH_APP', FW_ROOT.'app/');
-		define('FW_PTH_TEMP', FW_ROOT.'tmp/');
-		define('FW_PTH_DESIGN', FW_ROOT.'design/');
-		define('FW_PTH_COMPONENTS', FW_ROOT.'app/components/');
-		define('FW_PTH_CONTENT', FW_ROOT.'content/');
-		define('FW_PTH_CACHE', FW_ROOT.'cache/');
+		if (!defined('FW_PTH_ETC')) define('FW_PTH_ETC', FW_ROOT.'etc/');
 
 		if (file_exists($f = FW_PTH_ETC.'app.cfg.php')) include $f;
+		
+		// set default settings
+		if (!defined('FW_CHARSET')) define('FW_CHARSET', 'utf-8');
+		if (!defined('FW_CHARSET2')) define('FW_CHARSET2', 'utf8');
+		if (!defined('FW_LANGUAGE')) define('FW_LANGUAGE', 'ru');
+		if (!defined('FW_TIMEZONE')) define('FW_TIMEZONE', 'Asia/Yekaterinburg');
 
+		if (!defined('FW_PTH_TEMP')) define('FW_PTH_TEMP', FW_ROOT.'tmp/');
+		if (!defined('FW_PTH_DESIGN')) define('FW_PTH_DESIGN', FW_ROOT.'design/');
+		if (!defined('FW_PTH_CONTENT')) define('FW_PTH_CONTENT', FW_ROOT.'content/');
+		if (!defined('FW_PTH_CACHE')) define('FW_PTH_CACHE', FW_ROOT.'cache/');
+		
+		if (!defined('FW_PTH_APP')) define('FW_PTH_APP', FW_ROOT.'app/');
+		if (!defined('FW_PTH_LOCALE')) define('FW_PTH_LOCALE', FW_PTH_APP.'locale/');
+		if (!defined('FW_PTH_COMPONENTS')) define('FW_PTH_COMPONENTS', FW_PTH_APP.'components/');
+		if (!defined('FW_PTH_MODULES')) define('FW_PTH_MODULES', FW_PTH_APP.'modules/');
+		if (!defined('FW_PTH_DB')) define('FW_PTH_DB', FW_PTH_APP.'db/');
+		
 		date_default_timezone_set(FW_TIMEZONE);
 		set_exception_handler(array($this, "exceptionHandler"));
 
-		// TODO ?
-		ini_set('display_errors', 'On');
-		ini_set('error_reporting', E_ALL);
-		session_start();
-		setlocale(LC_ALL, "ru_RU.WINDOWS-1251");
+		session_start();  // TODO remove and use session module
+//		setlocale(LC_ALL, "ru_RU.WINDOWS-1251"); TODO remove
+		
+		// load locale
+		foreach(new \DirectoryIterator(FW_PTH_LOCALE) as $entry)
+			if (preg_match('/^'.FW_LANGUAGE.'(\.[a-z]+)?\.php$/', $entry))
+				require FW_PTH_LOCALE."$entry";
 
 		$this->systemLog = new \FW\Util\Log('system');
 		$this->mm = new ModuleManager($this);
 		$this->xslt = new \FW\Text\XSLTransformer(FW_PTH_DESIGN."xsl/");
 		$this->txparser = new \FW\Text\Parser(FW_LIB.'/app/stx/caption.php');
 		$this->exparser = new \FW\Text\Parser(FW_LIB.'/app/stx/call.php');
+		
 	}
 
 	function __destruct() {
@@ -98,7 +112,7 @@ class App extends \FW\Object {
 	public function __get($key) {
 		switch($key) {
 			case 'approot': return getcwd().'/';
-			case 'db': return !isset($this->db) ? $this->db = \FW\DB\DB::connect(FW_DB, FW_PTH_APP.'db/') : $this->db;
+			case 'db': return !isset($this->db) ? $this->db = \FW\DB\DB::connect(FW_DB, FW_PTH_DB) : $this->db;
 			case 'mm': return $this->mm;
 			case 'mt':
 				if (!isset($this->mt)) $this->mt = MailTransport::connect(FW_MAIL);

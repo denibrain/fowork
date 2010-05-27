@@ -287,11 +287,11 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$this->curField = new QueryField();
 				$this->expr = '';
 				break;
-			case 'open2a': # join clasure
-			case 'open2b':
-				if ($type == 'open2b') $this->tables[$this->tableAlias[$this->curTable]]['ex'] = 1;
+			case 'open2b': # alter join clasure
+				$this->tables[$this->tableAlias[$this->curTable]]['ex'] = 1;
 			case 'open2':  # where clasure
-			case 'open2c':  # where clasure
+			case 'open2a': # join clasure
+			case 'open2c':  # having clasure
 				$this->expr = '';
 				$this->cond = false;
 				break;
@@ -304,6 +304,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 	
 	private function prWhere($type, $v, $pos, $proc) {
 		switch ($type) {
+			
 			case 'z':
 			case 'close':
 				if ($proc->mapName == 'fset') {
@@ -402,7 +403,8 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$v = " ".strtoupper($v);
 				if ($proc->state == 'arg') $v.=" ";
 				$this->expr .= $v;
-				$this->curField->name = '';
+
+				if ($proc->mapName == 'fset') $this->curField->name = '';
 				break;
 			
 			case 'case':
@@ -411,7 +413,8 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			case 'func':
 				array_push($this->exprStack, $this->expr.$v);
 				$this->expr = '';
-				$this->curField->name = '';
+				
+				if ($proc->mapName == 'fset') $this->curField->name = '';
 				break;
 			
 			case 'case.end':
@@ -541,7 +544,6 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 }
 
 // initializate
-if (!defined('FW_PTH_DB')) define('FW_PTH_DB', FW_PTH_APP.'db/');
 DataSet::init();
 
 ?>

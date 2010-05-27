@@ -1,6 +1,9 @@
 <?php
 namespace FW;
 
+ini_set('display_errors', 'On');
+ini_set('error_reporting', E_ALL);
+
 if (!defined('FW_LIB')) define('FW_LIB', dirname(__FILE__).'/');
 
 spl_autoload_register(function ($name) {

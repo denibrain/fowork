@@ -64,6 +64,10 @@ class Text extends \FW\Object {
 
 	function attr()  {
 		$this->setEOL("\x0A");
+		if (!is_string($this->text)) {
+			print_r($this->text);
+			throw new \Exception("Is not text: ".$this->text);
+		}
 		return strtr($this->text,
 			array("\x0A"=> "&#10;", "'"=>"&#39;", "&"=>"&amp;", ">"=>"&gt;", "<"=>"&lt;", '"'=>"&quot;"));
 	}

@@ -23,16 +23,19 @@ class FormFields extends \FW\Object implements \IteratorAggregate {
 }
 
 class Form extends Component {
+	const OK = 1;
+	const NONE = 0;
+	const ERROR = 2;
 	
 	private $action;
 	private $method = 'POST';
 	private $caption;
+	private $pressedButton;
 	
-	private $buttons;
-	
-	private $status = FW_FS_NONE;
+	private $status = Form::NONE;
 	
 	private $fields;
+	private $buttons;
 	private $items = array();
 	
 	public  $userCheck = NULL;
@@ -41,12 +44,16 @@ class Form extends Component {
 	function __construct($name, $elements = '') {
 		parent::__construct($name);
 		$this->fields = new FormFields();
+		$this->buttons = new FormFields();
 		if ($elements) include $elements;
 	}
 	
 	function add(FormElement $e) {
-		$e->form = $this; $c = "\FW\VCL\FormField";
-		if ($e instanceof $c) $this->fields->add($e);
+		$e->form = $this;
+		$f = "\FW\VCL\FormField";
+		$b = "\FW\VCL\FormButton";
+		if ($e instanceof $f) $this->fields->add($e);
+		elseif ($e instanceof $b) $this->buttons->add($e);
 		return $this->items[] = $e;
 	}
 	
@@ -62,9 +69,23 @@ class Form extends Component {
 				$auxData =  $this->method == 'POST' ?
 					array_merge($_POST, $_FILES):$_GET;
 			}
-			$this->status =  $this->check($auxData) ? FW_FS_OK : FW_FS_ERROR;
+			$this->pressedButton = false;
+			foreach($this->buttons as $name => $button) if (isset($auxData[$name])) {
+				$this->pressedButton = $button;
+			}
+			if (!$this->pressedButton) {
+				$this->errors[] = array('code'=> "FF.invalidbutton", 'field'=>".common",
+					'text'=>S_FORM_INVALIDBUTTON);
+				$this->status = Form::ERROR;
+			}
+			else {
+				if ($this->pressedButton->type == 'submit')
+					$this->status =  $this->check($auxData) ? Form::OK : Form::ERROR;
+				else
+					$this->status = Form::OK;
+			}
 		} else {
-			$this->status = FW_FS_NONE;
+			$this->status = Form::NONE;
 		}
 		return $this->status;
 	}
@@ -122,6 +143,8 @@ class Form extends Component {
 			case 'method': return $this->method;
 			case 'status': return $this->status;
 			case 'fields': return $this->fields;
+			case 'pressedButton': return $this->pressedButton;
+			
 			default:
 				parent::__get($key);
 		}
