@@ -3,10 +3,6 @@ namespace FW\VCL;
 
 define('FW_FF_NOREQUIRE', 0x00);
 define('FW_FF_REQUIRE', 0x01);
-define('FW_FS_NONE', 0x00);
-define('FW_FS_ERROR', 0x01);
-define('FW_FS_OK', 0x02);
-define('FW_FS_SUBMITTED', 0x03);
 
 class EFormData extends \Exception {
 	

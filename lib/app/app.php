@@ -87,7 +87,7 @@ class App extends \FW\Object {
 	}
 	
 	function mailTo($text, $topic='Сообщение робота', $to='') {
-		$letter = new \FW\Mail\MailLetter('', $topic, FW_MAILSITE);
+		$letter = new \FW\Net\MailLetter('', $topic, FW_MAILSITE);
 
 		if (is_array($text)) {
 			if (count($text)==1) $letter->html = $text;
@@ -100,7 +100,7 @@ class App extends \FW\Object {
 		$letter->to = $to?$to:FW_MAILSITE;
 		$letter->subject =$topic;
 
-		$smtp = new \FW\Mail\SMTP(FW_MAILHOST);
+		$smtp = new \FW\Net\SMTP(FW_MAILHOST);
 		$smtp->send($letter);
 
 	}

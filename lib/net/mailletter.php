@@ -3,8 +3,6 @@ namespace FW\Net;
 
 use \FW\Object as Object;
 
-require "mail.transport.php";
-
 //@TODO remove recreate header of email
 //@TODO recreate date in header
 class MailAddress extends Object {
@@ -42,7 +40,7 @@ class MailAddress extends Object {
 	}
 	
 	function __toString() {
-		if ($this->name) return qencode($this->name)." <$this->email>";
+		if ($this->name) return T($this->name)->qencode." <$this->email>";
 		else return $this->email;
 	}
 }
@@ -99,7 +97,7 @@ class MailContent extends Object {
 	
 	function __construct($contentType, $enCode = 'base64') {
 		$this->body = '';
-		$this->headers = new MailHeader();
+		$this->headers = new Header();
 		$this->boundary = md5(microtime());
 		$this->encode = $enCode;
 		$this->id = md5(microtime());
@@ -233,7 +231,7 @@ class MailLetter extends Object {
 		$this->cc = new MailAddressList();
 		$this->replayTo = new MailAddressList();
 		$this->headers = false;
-		$this->userHeaders = new MailHeader();
+		$this->userHeaders = new Header();
 		
 		$this->hostname = (isset($_SERVER['SERVER_NAME']) ?
 			$_SERVER['SERVER_NAME'] : 
@@ -357,8 +355,14 @@ class MailLetter extends Object {
 	}
 
 	public function __toString() {
+		try {
+		
 		return //$this->__get('headers').
 			(string)$this->__get('body');
+
+		} catch (\Exception $e){
+			echo $e->getMessage();
+		}
 	}
 	
 	private function encodeHeadedr($string) {
@@ -366,7 +370,7 @@ class MailLetter extends Object {
 	}
 
 	private function createHeader() {
-		$h = new MailHeader();
+		$h = new Header();
 
 		$h->addDate();
 		$h->Return_Path = trim($this->sender == ''?$this->from:$this->sender);

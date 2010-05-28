@@ -110,14 +110,13 @@ class User extends \FW\Web\Module {
 	}
 
 	function fogot($form) {
-		$ds = $this->dataset('Byemail', $form->getValues());
+		$ds = $this->dsByemail($form->getValues());
 		if (!$ds->count()) throw new Exception('Данный пользователь в системе не найден');
 		while ($data = $ds->getA()) {
-			$data['pass'] = generatePass();
+			$data['pass'] = (string)new FW\Util\Password();
 			$data['login'] = sprintf("a%05d", $data['id']);
-			$data['passhash'] = $this->passhash($data['pass']);
-			$this->procedure('ChangePassword', $data);
-			App::$instance->notify(array(E('fogot', $data), 2=>'users.Fogot.mail'), 'Востановление пароля', $data['email']);
+			$this->dpChangePassword($data['id'], $this->passhash($data['pass']));
+			$this->app->mailTo(array(E('fogot', $data), 2=>'user.Fogot.mail'), 'Востановление пароля', $data['email']);
 		}
 	}
 
@@ -135,19 +134,21 @@ class User extends \FW\Web\Module {
 	}
 
 	function displayLogin() {
-		if($this->id) throw new ERedirect(dirname($_SERVER['REQUEST_URI']));
+		if($this->id)
+			throw new ERedirect(substr($r = $_SERVER['REQUEST_URI'], 0, strpos($r, '/') + 1));
 		
 		$form = $this->form('login');
-		$form->proceed();
-		if ($form->status == FW_FS_OK) 
+	
+		if ($form->proceed() == $form::OK) 
 			throw new ERedirect($_SERVER['REQUEST_URI']);
 		else
 			return E('login', $form->display());
 	}
 
 	function displayFogot() {
-		if (($form = $this->form('fogot')) == FW_FS_OK) 
-			throw new E('sended');
+		$form = $this->form('fogot');
+		if ($form->proceed() == $form::OK) 
+			return E('sended');
 		else
 			return E('fogot', $form->display());
 	}
@@ -192,7 +193,6 @@ class User extends \FW\Web\Module {
 
 		$xml .= "</person-changepass-page>";
 		return $xml;
-
 	}	
 }
 ?>
