@@ -3,8 +3,8 @@ namespace FW\Util;
 
 define('RE_INT', '\d+');
 define('RE_DOMAINITEM', '(?:xn--)?[a-z0-9](?:-?[a-z0-9])*');
+define('RE_DOMAIN2LEVEL', RE_DOMAINITEM.'(?:\.'.RE_DOMAINITEM.')*');
 define('RE_DOMAIN', RE_DOMAINITEM.'(?:\.'.RE_DOMAINITEM.')*');
-define('RE_DOMAIN2', '(?:xn--)?[a-z0-9](?:-?[a-z0-9])+[.][a-z]{2,6}');
 define('RE_WWW', '(?:https?://)?(?:www[.])'.RE_DOMAIN);
 define('RE_MAILBOX', '[a-z0-9](?:[._-]?[a-z0-9])*@'.RE_DOMAIN);
 define('RE_MAILBOXES', "(?:".RE_MAILBOX."; ?)*".RE_MAILBOX);
@@ -33,6 +33,7 @@ class Validator {
 		"email"=> array(RE_MAILBOX, '', 'i'),
 		"emails"=> array(RE_MAILBOXES, '', 'i'),
 		"domain" => array(RE_DOMAIN,'', 'i'),
+		"domain2level" => array(RE_DOMAIN2LEVEL,'', 'i'),
 		"www" => array(RE_WWW,'', 'i'),
 		"kpp" => "[0-9]{9}",
 		"inn10" => array('[0-9]{10}', 'INN10', ''),
