@@ -3,6 +3,8 @@ namespace FW\Net;
 
 use \FW\Object as Object;
 
+class EMailLetter extends \Exception {}
+
 //@TODO remove recreate header of email
 //@TODO recreate date in header
 class MailAddress extends Object {
@@ -19,7 +21,7 @@ class MailAddress extends Object {
 			case 'email':
 				// validate
 				if (!\filter_var($value, FILTER_VALIDATE_EMAIL)) 
-					throw new Exception("Invalid E-mail");
+					throw new EMailLetter("Invalid E-mail");
 				$this->email = $value;
 				break;
 			case 'name':
@@ -360,7 +362,7 @@ class MailLetter extends Object {
 		return //$this->__get('headers').
 			(string)$this->__get('body');
 
-		} catch (\Exception $e){
+		} catch (EMailLetter $e){
 			echo $e->getMessage();
 		}
 	}
@@ -461,7 +463,7 @@ class MailLetter extends Object {
 					@unlink($signed);
 					throw new EMail($this->Lang("signing").openssl_error_string());
 				}
-			} catch (EMail $e) {
+			} catch (EMailLetter $e) {
 				$body = '';
 				if ($this->exceptions) {
 					throw $e;
@@ -620,12 +622,5 @@ class MailLetter extends Object {
 		return (!isset($mimes[strtolower($ext)])) ? 'application/octet-stream' : $mimes[strtolower($ext)];
 	}
 
-}
-
-class EMail extends \Exception {
-	public function errorMessage() {
-		$errorMsg = '<strong>' . $this->getMessage() . "</strong><br />\n";
-		return $errorMsg;
-	}
 }
 ?>
