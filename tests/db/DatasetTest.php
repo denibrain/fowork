@@ -1,6 +1,6 @@
 <?php
 require_once 'PHPUnit/Framework.php';
-require_once "fwork.php";
+require_once "lib/fwork.php";
 
 class DatasetTest extends PHPUnit_Framework_TestCase {
 

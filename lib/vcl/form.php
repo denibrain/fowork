@@ -26,17 +26,20 @@ class Form extends Component {
 	const OK = 1;
 	const NONE = 0;
 	const ERROR = 2;
+	const REFRESH = 3;
 	
 	private $action;
 	private $method = 'POST';
 	private $caption;
 	private $pressedButton;
+	private $detectRefresh = false;
 	
 	private $status = Form::NONE;
 	
 	private $fields;
 	private $buttons;
 	private $items = array();
+	private $id;
 	
 	public  $userCheck = NULL;
 	private $errors;
@@ -68,7 +71,11 @@ class Form extends Component {
 			if (false===$auxData) {
 				$auxData =  $this->method == 'POST' ?
 					array_merge($_POST, $_FILES):$_GET;
+				$this->id = $_POST['_id'];
 			}
+			else
+				$this->id = false;
+				
 			$this->pressedButton = false;
 			foreach($this->buttons as $name => $button) if (isset($auxData[$name])) {
 				$this->pressedButton = $button;
@@ -81,12 +88,19 @@ class Form extends Component {
 			else {
 				if ($this->pressedButton->type == 'submit')
 					$this->status =  $this->check($auxData) ? Form::OK : Form::ERROR;
-				else
-					$this->status = Form::OK;
+				else {
+					if ($this->id && $this->detectRefresh &&
+						$_SESSION['form'][$this->name]['id'] === $this->id)
+						$this->status = Form::REFRESH;
+					else
+						$this->status = Form::OK;
+				}
 			}
 		} else {
 			$this->status = Form::NONE;
 		}
+		if ($this->status != Form::OK)
+			$_SESSION['form'][$this->name]['id'] = $this->id = md5(microtime());
 		return $this->status;
 	}
 	
@@ -125,6 +139,7 @@ class Form extends Component {
 		$e = E('form',
 			A('caption', $this->caption,
 			  'name', $this->name,
+			  'id', $this->id,
 			  'action', $this->action,
 			  'method', $this->method));
 		

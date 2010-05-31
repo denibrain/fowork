@@ -211,8 +211,14 @@ class FFCheckbox extends FormField {
 	
 }
 
-class FFList extends FormField {
+class FFList extends FormField implements \ArrayAccess, \IteratorAggregate {
 	private $options = array();
+
+	public function offsetExists($offset) { return isset($this->options[$offset]); }
+	public function offsetGet($offset) { return $this->options[$offset]; }
+	public function offsetSet($offset, $value) { $this->options[$offset] = $value; }
+	public function offsetUnset($offset) { unset($this->options[$offset]); }
+	public function getIterator() { return new ArrayIterator($this->options); }
 	
 	function validate($value) {
 		if (!isset($this->options[$value]))

@@ -27,7 +27,7 @@ class PgSQL extends DB {
 	}
 	
 	function begin() {
-		$this->execute("BEGIN");
+		$this->execute("START TRANSACTION");
 	}
 	
 	function commit() {
