@@ -10,6 +10,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 	function testPg() {
 		$db = \FW\DB\DB::connect("pgsql://postgres:admin@localhost/testwork");
 
+		$db("DELETE FROM author;");
 		$db("INSERT INTO author (name) VALUES ('Ahmatova')");
 		$q = $db("SELECT * FROM author ");
 		$this->assertEquals("1", $q->count());

@@ -15,6 +15,9 @@ class DatasetTest extends PHPUnit_Framework_TestCase {
 		$ds = new FW\DB\Dataset("tableA[?id=:id]", array('id'=>'z'), $db);
 		$this->assertEquals("SELECT * FROM \"tableA\" AS t0 WHERE (t0.\"id\" = 'z')", $ds->sql);
 
+		$ds = new FW\DB\Dataset("tableA[?id=':{id}']", array('id'=>'z'), $db);
+		$this->assertEquals("SELECT * FROM \"tableA\" AS t0 WHERE (t0.\"id\" = 'z')", $ds->sql);
+
 		$ds = new FW\DB\Dataset("tableA [id=2] @[x=1]", array(), $db);
 		$this->assertEquals("SELECT * FROM \"tableA\" AS t0 WHERE (t0.\"id\" = 2) HAVING (t0.\"x\" = 1)", $ds->sql);
 	}

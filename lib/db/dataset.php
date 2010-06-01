@@ -379,7 +379,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			case 'str1':
 			case 'str2':
 				$self = $this;
-				$v = preg_replace_callback('/\${([a-z0-9]+)}/i',
+				$v = preg_replace_callback('/:{([a-z0-9]+)}/i',
 					function($matches) use ($self){
 						$v = $matches[1];
 						if (isset($self->params[$v])) return $self->params[$v];
@@ -489,33 +489,38 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			$sql .= implode(", ", $this->fields);
 		}
 
-		reset($this->tables);
-		list($main, $tinfo) = each($this->tables);
-		$ma = $tinfo['alias'];
-		
+		$tkeys = array_keys($this->tables);
+		$main = array_shift($tkeys);
+		$ma  = $this->tables[$main]['alias'];
 		$sql.= " FROM ".$this->db->q($main)." AS $ma";
+
 		$prev = false;
 		
 		$no = 0;
-		while (list($key, $tinfo) = each($this->tables))  {
+		foreach($tkeys as $no => $key) {
+			$tinfo = $this->tables[$key];
 			$sql.= !$tinfo['outer'] ?" INNER":" LEFT";
 			$sql.= " JOIN ".$this->db->q($key). "AS {$tinfo['alias']} ON ";
+			
 			$relation = false;
 			if (!$tinfo['ex']) {
-				if (false===($relation = $this->db->relation($main, $key, $ma, $tinfo['alias']))) {
-					if ($no >= 1) {
-						$relation =	$this->db->relation($prev, $key,
-								$this->tables[$prev]['alias'], $tinfo['alias']);
-					}
-					if ($no >= 2 && false===$relation) {
-						foreach($this->tables as $i=>$t) if ($i!=$key && $prev != $i && $main != $i) {
+				$relation = $this->db->relation($main, $key, $ma, $tinfo['alias']);
+				if (!$relation && $no) {
+					$prev = $tkeys[$no - 1];
+					$relation =	$this->db->relation($prev, $key,
+						$this->tables[$prev]['alias'], $tinfo['alias']);
+					
+					if (!$relation && $no > 1) {
+						foreach($tkeys as $i=>$tk) if ($i!=$no && $i != $no - 1) {
+							$t = $this->tables[$tk];
 							if (false!==($relation =
-								$this->db->relation($i, $key, $t['alias'], $tinfo['alias']))) break;
+								$this->db->relation($tk, $key, $t['alias'], $tinfo['alias'])))
+								break;
 						}
 					}
 				}
 				if (false===$relation) {
-					print_r($this->tables);
+					print_r($tkeys);
 					throw new \Exception("Can not find relation for table $key");
 				}
 				$sql .= $relation;
@@ -524,8 +529,6 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				if (!$tinfo['ex']) $sql.= ' AND ';
 				$sql.= "(".implode(") AND (", $tinfo['joincl']).")";
 			}
-			$prev = $key;
-			$no++;
 		}
 		$this->sql = $sql;
 		
