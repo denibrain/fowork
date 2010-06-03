@@ -62,15 +62,26 @@ class Page extends FW\App\Module {
 				$contents[$name] = $this->app->content($c, $h);
 			}
 		}
-		if (!isset($contents['text'])) {
-			$name = FW_PTH_CONTENT.FW_TBL_PAGE.".art/".
+	
+		$templateFile = FW_PTH_DESIGN."templates/$template.html";
+		if (!file_exists($templateFile) or !is_readable($templateFile))
+			throw new \Exception("Template $template not found or cannot read!");
+			
+		$templateText = file_get_contents($templateFile);
+		
+		$bodyTemplate = FW_PTH_CONTENT.FW_TBL_PAGE.".art/".
 				($this->id ? str_replace('*', '_', $this->id) : '!');
-			$contents['text'] = file_exists($name) ? file_get_contents($name) : "";
+
+		if (file_exists($bodyTemplate)) {
+			if (!is_readable($bodyTemplate))
+				throw new \Exception("BodyTemplate $bodyTemplate cannot read!");
+			$templateText = str_replace('{text}', file_get_contents($bodyTemplate), $templateText);
 		}
 		
 		$app = $this->app;
-		$template = new \FW\Text\ParametricTemplate(
-			FW_PTH_DESIGN."templates/$template.html",
+		$template = new \FW\Text\ParametricTemplate();
+		$template->setText(
+			$templateText,
 			function($field, $value) use ($app, $h) {
 				return $app->content($value, $h);
 			});

@@ -23,10 +23,10 @@ class ParametricTemplate extends Template {
 		else throw new \Exception("No param with name '$key'");
 	}
 	
-	public function setText($text) {
+	public function setText($text, $defvresolver = false) {
 		$this->insets = array();
 		$this->params = array();
-		$f = $this->defvresolver;
+		$f = $defvresolver ? $defvresolver : $this->defvresolver;
 		if (preg_match_all('/{([a-z](?:[a-z]|-[a-z])*)(?::([^}]+))?}/', $text, $regs, PREG_SET_ORDER )) {
 			foreach($regs as $param) if (!isset($this->insets[$param[0]])) {
 				$inset = array_shift($param);

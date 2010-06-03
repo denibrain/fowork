@@ -3,7 +3,7 @@ namespace FW\VCL {
 
 require "form.elements.php";
 
-class FormFields extends \FW\Object implements \IteratorAggregate {
+class FormFields extends \FW\Object implements \IteratorAggregate, \ArrayAccess {
 	private $items = array();
 
 	function __get($key) {
@@ -17,17 +17,22 @@ class FormFields extends \FW\Object implements \IteratorAggregate {
 		$this->items[$item->name] = $item;
 	}
 	
+	public function offsetExists ($offset) {return isset($this->items[$offset]); }
+	public function offsetGet ($offset) { return $this->items[$offset]; }
+	public function offsetSet ($offset, $value) { throw new \Exception("Use method add"); }
+	public function offsetUnset ($offset) { unset($this->items[$offset]); }
+	
 	function getIterator() {
 		return new \ArrayIterator($this->items);
 	}
 }
 
-class Form extends Component {
+class Form extends Component implements \ArrayAccess {
 	const OK = 1;
 	const NONE = 0;
 	const ERROR = 2;
 	const REFRESH = 3;
-	
+
 	private $action;
 	private $method = 'POST';
 	private $caption;
@@ -43,6 +48,11 @@ class Form extends Component {
 	
 	public  $userCheck = NULL;
 	private $errors;
+
+	public function offsetExists($offset) { return $this->fields->offsetExists($offset); }
+	public function offsetGet($offset) { return $this->fields->$offset->value; }
+	public function offsetSet($offset, $value) { $this->fields->$offset->value = $value; }
+	public function offsetUnset($offset) { throw new \Exception("Cannot delete field"); }
 
 	function __construct($name, $elements = '') {
 		parent::__construct($name);

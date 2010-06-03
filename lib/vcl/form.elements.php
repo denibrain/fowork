@@ -1,9 +1,6 @@
 <?php
 namespace FW\VCL;
 
-define('FW_FF_NOREQUIRE', 0x00);
-define('FW_FF_REQUIRE', 0x01);
-
 class EFormData extends \Exception {
 	
 	private $codeName;
@@ -78,6 +75,9 @@ class FBCancel extends FormButton {
 
 
 class FormField extends FormElement {
+	const REQUIRED = 0x00;
+	const OPTIONAL = 0x01;
+	
 	private $value = false;
 	private $name;
 	private $comment;
@@ -85,7 +85,7 @@ class FormField extends FormElement {
 	private $caption;
 	private $type;
 
-	public function __construct($name, $caption, $req = FW_FF_NOREQUIRE,
+	public function __construct($name, $caption, $req = FormField::REQUIRED,
 								$comment = '', $defValue = '') {
 		$this->name = $name;
 		$this->caption = $caption;
