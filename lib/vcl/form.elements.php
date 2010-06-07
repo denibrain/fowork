@@ -73,10 +73,9 @@ class FBCancel extends FormButton {
 	}
 }
 
-
 class FormField extends FormElement {
-	const REQUIRED = 0x00;
-	const OPTIONAL = 0x01;
+	const REQUIRED = 0x01;
+	const OPTIONAL = 0x00;
 	
 	private $value = false;
 	private $name;
@@ -85,19 +84,19 @@ class FormField extends FormElement {
 	private $caption;
 	private $type;
 
-	public function __construct($name, $caption, $req = FormField::REQUIRED,
+	public function __construct($name, $caption, $type = FormField::REQUIRED,
 								$comment = '', $defValue = '') {
 		$this->name = $name;
 		$this->caption = $caption;
 		$this->comment = $comment;
 		$this->value = $defValue;
 		$this->type = strtolower(substr(get_class($this), 9));
-		$this->require = $req;
+		$this->require = $type;
 	}
 
 	/* check value, if error exists then throw exception */
 	public function validate($newValue) {
-		if ($newValue === '' && $this->require)
+		if ($newValue === '' && $this->require == FormField::REQUIRED)
 			throw new EFormData('FF.require', $this->name);
 	}
 

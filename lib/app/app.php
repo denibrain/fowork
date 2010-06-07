@@ -28,13 +28,13 @@ class App extends \FW\Object {
 		if (!defined('FW_PTH_ETC')) define('FW_PTH_ETC', FW_ROOT.'etc/');
 
 		if (file_exists($f = FW_PTH_ETC.'app.cfg.php')) include $f;
-		
-		// set default settings
+
 		if (!defined('FW_CHARSET')) define('FW_CHARSET', 'utf-8');
 		if (!defined('FW_CHARSET2')) define('FW_CHARSET2', 'utf8');
 		if (!defined('FW_LANGUAGE')) define('FW_LANGUAGE', 'ru');
 		if (!defined('FW_TIMEZONE')) define('FW_TIMEZONE', 'Asia/Yekaterinburg');
-
+		
+		// set default settings
 		if (!defined('FW_PTH_TEMP')) define('FW_PTH_TEMP', FW_ROOT.'tmp/');
 		if (!defined('FW_PTH_DESIGN')) define('FW_PTH_DESIGN', FW_ROOT.'design/');
 		if (!defined('FW_PTH_CONTENT')) define('FW_PTH_CONTENT', FW_ROOT.'content/');
@@ -46,11 +46,12 @@ class App extends \FW\Object {
 		if (!defined('FW_PTH_MODULES')) define('FW_PTH_MODULES', FW_PTH_APP.'modules/');
 		if (!defined('FW_PTH_DB')) define('FW_PTH_DB', FW_PTH_APP.'db/');
 		
+
 		date_default_timezone_set(FW_TIMEZONE);
 		set_exception_handler(array($this, "exceptionHandler"));
 
+		ini_set('session.save_path', FW_PTH_TEMP);
 		session_start();  // TODO remove and use session module
-//		setlocale(LC_ALL, "ru_RU.WINDOWS-1251"); TODO remove
 		
 		// load locale
 		foreach(new \DirectoryIterator(FW_PTH_LOCALE) as $entry)
@@ -62,7 +63,6 @@ class App extends \FW\Object {
 		$this->xslt = new \FW\Text\XSLTransformer(FW_PTH_DESIGN."xsl/");
 		$this->txparser = new \FW\Text\Parser(FW_LIB.'/app/stx/caption.php');
 		$this->exparser = new \FW\Text\Parser(FW_LIB.'/app/stx/call.php');
-		
 	}
 
 	function __destruct() {

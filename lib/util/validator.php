@@ -27,6 +27,7 @@ class Validator {
 		"textarea"=>array("[\\n\\r\\t*\\/()\"!:;'¹,.0-9A-Za-zà-ÿÀ-ß -]+", '', 's'),
 		"int"=>"[0-9]+",
 		"latintext"=>"[a-zA-Z-\\s]+",
+		"numberlatin"=>"[0-9a-zA-Z-\\s]+",
 		"date"=>"[0-9]{2}[.-][0-9]{2}[.-][0-9]{4}",
 		"phone"=>RE_PHONE,
 		"phones"=>RE_PHONES,
