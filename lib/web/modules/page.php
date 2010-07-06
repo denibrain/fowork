@@ -195,7 +195,7 @@ class Page extends FW\App\Module {
 				/* static page */
 				foreach($nodes[$parent] as $nodeurl => $params) {
 					$realid = "$nodeurl.$name";
-					$h= !$href ? "$realid.html" : $href;
+					$h= !$href ? $realid : $href;
 					array_unshift($params, $name);
 					$selected = isset($this->path[$realid]);
 					if ($selected)
@@ -214,9 +214,7 @@ class Page extends FW\App\Module {
 						foreach($map as $key=>$caption) {
 							$realid = "$nodeurl.$key";
 							$tree[$nodeurl][$realid] = array(
-								$caption,
-								"$realid.html",
-								$selected = isset($this->path[$realid])
+								$caption, $realid, $selected = isset($this->path[$realid])
 							);
 							if (!$onlyActive || $selected)
 								$nodes[$id][$realid] = array_merge(array($key), $params);
@@ -227,9 +225,7 @@ class Page extends FW\App\Module {
 					if (($ex = array_intersect_key($nodes[$parent], $this->path)) && isset($this->path2[$id])) {
 						list($realid, $params) = $this->path2[$id];
 						$tree[key($ex)][$realid] = array(
-							$this->path[$realid],
-							"$realid.html",
-							$selected = true
+							$this->path[$realid],$realid, $selected = true
 						);
 						$nodes[$id][$realid] = $params;
 					}
@@ -239,7 +235,7 @@ class Page extends FW\App\Module {
 		$root = E();
 		$root->selected = $s = (int)('' === $startUrl || isset($this->path[$startUrl]));
 		$root->caption = ($s && '' !== $startUrl) ? $this->path[$startUrl] : '';
-		$root->href = "$startUrl.html";
+		$root->href = $startUrl;
 		$root->id = $startUrl;
 
 		$list = array($startUrl=>$root);
@@ -271,7 +267,7 @@ class Page extends FW\App\Module {
 	function displayPath($params) {
 		$path = E('path');
 		foreach($this->path as $key=>$value)
-			$path->add(E('item', array("href"=>"$key.html", 'name'=>$value)));
+			$path->add(E('item', array("href"=>$key, 'name'=>$value)));
 		return $path;
 	}
 	

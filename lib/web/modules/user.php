@@ -129,7 +129,7 @@ class User extends \FW\Web\Module {
 	
 	function displayLogout() {
 		$this->logout();
-		throw new ERedirect('login.html');
+		throw new ERedirect('login');
 		return E('quit');
 	}
 
@@ -172,27 +172,23 @@ class User extends \FW\Web\Module {
 	/* display personal info
 	@param id client ID
 	*/
-	function displayPersonChangePass() {
-		$xml = "<person-changepass-page>";
-
-		if (isset($_POST['change'])) {
-
-			$q = &Kernel::$instance->execSQL("SELECT email, id, name, person
-										 FROM {$this->tablename} WHERE id = '{$this->userId}'");
-			if($q->num_rows() < 1) throw new Exception('Данный пользователь в системе не найден');
-
-			$data = $q->getA();
-			$data['pass'] = generatePass();
-			$data['login'] = sprintf("a%05d", $data['id']);
-			$pass =  $this->passhash($data['pass']);
-			$this->execSQL('UPDATE ' . $this->tablename . ' SET pass = '.$pass.'")WHERE id = "' . $data['id'] . '"');
-			Kernel::$instance->notify(array(data2xml($data, 'changedpass'), 2=>'users.PersonChangePass.mail'), 'Смена пароля', $data['email']);
-			return "<complete/>";
+	function displayChangePass($params) {
+		if (!($user = $this->dsUser($params)->getA()))
+			throw new E404();
+		
+		$form = new \FW\VCL\Form('changepass');
+		$form->add(new \FW\VCL\FBSubmit("изменить", "change"));
+		
+		if ($form->proceed() == $form::OK) {
+			$user['pass'] = (string)new \FW\Util\Password();
+			$user['login'] = sprintf("a%05d", $user['id']);
+			$pass =  $this->passhash($user['pass']);
+			$this->dpChangepassword($user['id'], $pass);
+			$this->app->mailTo(
+				array(E('changedpass', $user), 2=>'user.ChangePass.mail'), 'Смена пароля', $user['email']);
+			
+			return E('complete');
 		}
-		else return "<welcome/>";
-
-		$xml .= "</person-changepass-page>";
-		return $xml;
+		else return E('welcome', $form->display());
 	}	
 }
-?>

@@ -67,6 +67,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 	private $opened = false;
 	private $data;
 	private $q;
+	private $count = false;
 	
 	// Dynamic
 	private $filter = false;
@@ -159,6 +160,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			case 'sort': return $this->sort;
 			case 'params': return $this->params;
 			case 'filter': return $this->filter;
+			case 'count': return $this->count === false ? $this->count = $this->count() : $this->count;
 			default: return parent::__get($key);
 		}
 	}
@@ -316,6 +318,10 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 					$this->expr .= $type == 'z' ? ' WHERE ':' END)';
 				}
 				break;
+			case 'typecast':
+				$this->expr	.= $v;
+				break;
+			
 			case 'deq':
 				$this->expr .= ' WHEN ';
 				break;
@@ -396,6 +402,8 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 					break;
 				}
 				
+			case 'op3':
+				$v = 'NOT '.substr($v, 1);
 			case 'op':
 			case 'unop':
 			case 'op2':
@@ -452,7 +460,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 		} else $name = $this->curField->name;
 
 		if (isset($this->fields[$name]))
-			throw new Exception("Duplicate field name [{$name}]");
+			throw new EDB("Duplicate field name [{$name}]");
 		
 		if ($this->curField->aliased)
 			$this->fieldAlias[$name] = $this->expr;

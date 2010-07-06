@@ -1,33 +1,7 @@
 <?php
-namespace FW\VCL {
+namespace FW\VCL\Forms {
 
-require "form.elements.php";
-
-class FormFields extends \FW\Object implements \IteratorAggregate, \ArrayAccess {
-	private $items = array();
-
-	function __get($key) {
-		if (isset($this->items[$key])) return $this->items[$key];
-		else return parent::__get($key);
-	}
-	
-	function add($item) {
-		if (isset($this->items[$item->name]))
-			throw new \Exception("Field {$this->name} already exists");
-		$this->items[$item->name] = $item;
-	}
-	
-	public function offsetExists ($offset) {return isset($this->items[$offset]); }
-	public function offsetGet ($offset) { return $this->items[$offset]; }
-	public function offsetSet ($offset, $value) { throw new \Exception("Use method add"); }
-	public function offsetUnset ($offset) { unset($this->items[$offset]); }
-	
-	function getIterator() {
-		return new \ArrayIterator($this->items);
-	}
-}
-
-class Form extends Component implements \ArrayAccess {
+class Form extends \FW\VCL\Component implements \ArrayAccess {
 	const OK = 1;
 	const NONE = 0;
 	const ERROR = 2;
@@ -63,8 +37,8 @@ class Form extends Component implements \ArrayAccess {
 	
 	function add(FormElement $e) {
 		$e->form = $this;
-		$f = "\FW\VCL\FormField";
-		$b = "\FW\VCL\FormButton";
+		$f = "\FW\VCL\Forms\FormField";
+		$b = "\FW\VCL\Forms\Button";
 		if ($e instanceof $f) $this->fields->add($e);
 		elseif ($e instanceof $b) $this->buttons->add($e);
 		return $this->items[] = $e;
@@ -179,7 +153,7 @@ class Form extends Component implements \ArrayAccess {
 }
 
 namespace {
-	class EFormUser extends \FW\VCL\EFormData {
+	class EFormUser extends \FW\VCL\Forms\EFormData {
 		function EFormUser($message, $field = '.common', $code = 'FF.user') {
 			parent::__construct($code, $field, $message);
 		}

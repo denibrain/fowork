@@ -30,6 +30,7 @@ class Content extends \FW\Object {
 		'xml' => 'text/xml',
 		'text' => 'text/plain',
 		'html' => 'text/html',
+		'json' => 'application/json',
 		'css' => 'text/css'
 	);
 	
@@ -57,7 +58,7 @@ class Content extends \FW\Object {
 	}
 	
 	function send() {
-		header('HTTP/1.1'.$this->code);
+		header('HTTP/1.1 '.$this->code);
 		if (isset(Content::$contentTypes[$this->type])) {
 			$type = Content::$contentTypes[$this->type];
 			header('Content-type: '.$type);

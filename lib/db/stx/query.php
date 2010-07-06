@@ -6,8 +6,7 @@ $dnm = "[a-z][.a-z0-9_-]*";
 $this->ignoreSpace = true;
 
 $this->terms = array(
-	'bool'	=> 'true|false|null',  # BOOLS
-	'not'	=> 'not|any',
+	'bool'	=> '\btrue|false|null\b',  # BOOLS
 	'case'  => '\(\?',
     'deq'   => '==',
     'arrow' => '=>',
@@ -16,7 +15,9 @@ $this->terms = array(
 	'open2c' => '@\[',
     'else'  => '\belse\b',
 	'cond'	=> '\?',
+    'op3'   => '!in\b',
 	'op2'	=> '\b(?:like|in|or|and|xor|between|from|is)\b',
+	'not'	=> '\bnot|any\b',
 	'limit'	=> '\#[0-9]+', # #1,5
 	'jnm'	=> "[*.]$dnm", # .closes
 	'order'	=> "[+-]$dnm", # +order -time
@@ -69,7 +70,7 @@ $this->maps['fset'] = array(
 	'operator'	=> $op,
 	'next'		=> $op,
 	'unop' 		=> $unop,
-	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,mult,op2'=>'operator', 'alias'=>'alias', 'typecast'=>'typecast',	'flag'=>'flag'),
+	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,mult,op2,op3'=>'operator', 'alias'=>'alias', 'typecast'=>'typecast',	'flag'=>'flag'),
 	'typecast'  => array('z' => 'next', 'close'=>'-', 'flag'=>'flag', 'alias'=>'alias'),
 	'alias'		=> array('z' => 'next', 'close'=>'-', 'flag'=>'flag'),
 	'flag'		=> array('z' => 'next', 'close'=>'-'),
@@ -83,7 +84,8 @@ $this->maps['expr'] = array(
 	'operator'	=> $op,
 	'next'		=> $op,
 	'unop' 		=> $unop,
-	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,op2'=>'operator')
+    'typecast'  => array('z' => 'next', 'close'=>'-', 'op,unop,op2,op3'=>'operator'),
+	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,op2,op3'=>'operator', 'typecast'=>'typecast')
 );
 
 $this->maps['func'] = $this->maps['expr'];
@@ -94,7 +96,8 @@ $this->maps['where'] = array(
 	'operator'	=> $op,
 	'cond'		=> $op, 
 	'unop' 		=> $unop,
-	'arg'		=> array('close2'=>'-', 'op,unop,op2'=>'operator', 'alias'=>'alias')
+    'typecast'  => array('close2'=>'-', 'op,unop,op2,op3'=>'operator', 'alias'=>'alias'),
+	'arg'		=> array('close2'=>'-', 'op,unop,op2,op3'=>'operator', 'alias'=>'alias', 'typecast'=>'typecast')
 );
 $this->maps['where']['begin']['cond'] = 'cond';
 
@@ -106,8 +109,8 @@ $this->maps['case'] = array(
 	'else'	=> $op,
 	'next'		=> $op,
 	'unop' 		=> $unop,
-    
-	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,op2'=>'operator', 'deq'=>'deq', 'arrow'=>'arrow', 'else'=>'else')
+    'typecast'  => array('z' => 'next', 'close'=>'-', 'op,unop,op2,op3'=>'operator', 'deq'=>'deq', 'arrow'=>'arrow', 'else'=>'else'),
+	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,op2,op3'=>'operator', 'deq'=>'deq', 'arrow'=>'arrow', 'else'=>'else', 'typecast'=>'typecast')
 )
 
 ?>

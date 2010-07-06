@@ -36,7 +36,7 @@ class DBMySQLiQuery extends DBQuery {
 
 	function getA() { return mysqli_fetch_assoc($this->handle);  }
 	function get() { return mysqli_fetch_row($this->handle);  }
-	function val() { return (list($v) = mysqli_fetch_row($this->handle)))?$v:false; }
+	function val() { return (list($v) = mysqli_fetch_row($this->handle))?$v:false; }
 	function count() {return mysqli_num_rows($this->handle);  }
 }
 ?>

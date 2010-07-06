@@ -3,19 +3,31 @@ namespace FW\Util;
 
 /* only 1970 - 20 */
 
-define("DTI_1",    365);
-define("DTI_4",    DTI_1   * 4 + 1);
-define("DTI_100",  DTI_4  * 25 - 1);
-define("DTI_400",  DTI_100 * 4 + 1);
-define("DTI_3200", DTI_400 * 8 - 1); 
 
-define("DTI_DAY",    1);
-define("DTI_YEAR",   2);
-define("DTI_MONTH",  3);
-
-
+/*
+ * @property int $day 1..31
+ * @property int $month 1..12
+ * @property int $year 0..2999
+ * @property DateTime $monthLastDate
+ * @property int $monthSize 28..31;
+ * @property int $hour 0..23
+ * @property int $minute 0..59
+ * @property int $second 0..59
+ * @property string $date YYYY-MM-DD
+ * @property int $days Amount days between date & 0000-00-00
+ * @property int $timestamp Timestamp is Timestamp
+ */
 class DateTime extends \FW\Object {
-	
+
+	const I1	= 		365;
+	const I4	=	   1461;
+	const I100	= 	  36524;
+	const I400	= 	 146097;
+	const I3200 = 	1168775; 
+
+	const IDAY = 1;
+	const IYEAR = 2;
+	const IMONTH = 3;	
 	static public $monthLength = Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 	static public $monthOffset = Array(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334);
 	
@@ -36,6 +48,7 @@ class DateTime extends \FW\Object {
 	static function getmicrotime() { list($usec, $sec) = explode(" ",microtime()); return ((float)$usec + (float)$sec); }
 	
 	function __construct($init = false) {
+		$dt = "\FW\Util\DateTime";
 		if ($init === false) $init = time();
 		if (is_int($init)) {
 			$d = getdate($init);
@@ -45,8 +58,16 @@ class DateTime extends \FW\Object {
 			$this->hour = $d['hours'];
 			$this->minute = $d['minutes'];
 			$this->second = $d['seconds'];
+		}
+		elseif ($init instanceof $dt) {
+			$this->day = $init->day;
+			$this->setYear($init->year);
+			$this->setMonth($init->month);
+			$this->hour = $init->hour;
+			$this->minute = $init->minute;
+			$this->second = $init->second;
 		} else {
-			$d = date_parse((string)$init);
+			$d = @date_parse((string)$init);
 			$this->day = $d['day'] - 1;
 			$this->setYear($d['year']);
 			$this->setMonth($d['month'] - 1);
@@ -59,10 +80,10 @@ class DateTime extends \FW\Object {
 	}
 	
 	static function yearToDays($year) {
-		$d2 =  DTI_400 * (int)($year / 400); $year %= 400;
-		$d2 += DTI_100 * (int)($year / 100); $year %= 100;
-		$d2 += DTI_4 * ($year >> 2);   $year &= 3;
-		$d2 += DTI_1 * $year;
+		$d2 =  DateTime::I400 * (int)($year / 400); $year %= 400;
+		$d2 += DateTime::I100 * (int)($year / 100); $year %= 100;
+		$d2 += DateTime::I4 * ($year >> 2);   $year &= 3;
+		$d2 += DateTime::I1 * $year;
 		return $d2;
 	}
 	
@@ -77,14 +98,15 @@ class DateTime extends \FW\Object {
 		switch ($key) {
 			case 'day': return $this->day + 1;
 			case 'monthSize': return $this->monthSize;
-
-
 			case 'month': return $this->month + 1;
 			case 'year': return $this->year;
 			case 'hour': return $this->hour;
 			case 'minute': return $this->minute;
 			case 'second': return $this->second;
 			case 'date': return sprintf("%04d-%02d-%02d", $this->year, $this->month + 1, $this->day + 1);
+			case 'monthLastDate':
+				$d = new DateTime($this);
+				return $d;
 			case 'days': return $this->days === false ? $this->days = $this->getDays() : $this->days;
 			case 'timestamp': return $this->timestamp;
 			default:
@@ -113,18 +135,18 @@ class DateTime extends \FW\Object {
 	function addInterval($int, $step) {
 		if (!$int) return $this;
 
-		if ($step == DTI_YEAR) {
+		if ($step == DateTime::IYEAR) {
 			$this->days = false;
 			$this->setYear($this->year + $int);
 		}
-		elseif ($step == DTI_MONTH) {
+		elseif ($step == DateTime::IMONTH) {
 			$this->days = false;
 			$int += $this->month;
 			if ($int < 0) throw new \Exception("Result month is negative");
 			if ($v = $int / 12) $this->setYear($this->year + $v);
 			$this->setMonth($int % 12);
 		}
-		if ($step == DTI_DAY) {
+		if ($step == DateTime::IDAY) {
 			$start = $this->__get('days');
 			
 			if ($this->month > 1) $start += (int)$this->bissextile;
@@ -132,7 +154,7 @@ class DateTime extends \FW\Object {
 			if ($start < 0) throw new \Exception("Result is negative");
 			
 			$y = 0;
-			$a = array(400=>DTI_400, 100=>DTI_100, 4=>DTI_4, 1=>DTI_1);
+			$a = array(400=>DateTime::I400, 100=>DateTime::I100, 4=>DateTime::I4, 1=>DateTime::I1);
 			foreach($a as $k => $size)
 			if ($start >= $size) {
 				$y += $k * (int)($start / $size);
@@ -162,11 +184,11 @@ class DateTime extends \FW\Object {
 	}
 
 	function interval($sub, $unit) {
-		if ($unit == DTI_DAY) return $this->__get('days') - $sub->__get('days');
+		if ($unit == DateTime::IDAY) return $this->__get('days') - $sub->__get('days');
 		else
-		if ($unit == DTI_YEAR) return $this->year - $sub->year;
+		if ($unit == DateTime::IYEAR) return $this->year - $sub->year;
 		else
-		if ($unit == DTI_MONTH) return ($this->year - $sub->year) * 12 + $this->month - $sub->month;
+		if ($unit == DateTime::IMONTH) return ($this->year - $sub->year) * 12 + $this->month - $sub->month;
 		
 		return 0;
 	}

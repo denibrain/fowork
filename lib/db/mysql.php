@@ -16,21 +16,26 @@ class MySQL extends DB {
 		$this->dbname = 'test';
 		$this->user = 'root';
 		$this->pass = '';
-		$this->host = 'localhost';
 		$this->port = 3306;
 
-		$this->queryClass = 'FW\MySQLQuery';
-		
-        if (false===($this->handle = @mysql_connect("$host:$port", $user, $pass, true)))
-            throw new EDB("Cannot connect DB to $host");
-        if (false===mysql_select_db($dbname, $this->handle))
+		$this->queryClass = 'FW\DB\MySQLQuery';
+    }
+    
+    function open() {
+        if (false===($this->handle = @mysql_connect("$this->host:$this->port", $this->user, $this->pass, true)))
+            throw new EDB("Cannot connect DB to $this->host");
+        if (false===mysql_select_db($this->dbname, $this->handle))
             throw new EMySQL($this->handle);
+		
+	\mysql_query("SET NAMES '".FW_CHARSET."'");
+	$this->connected = true;		
     }
 
-    function __destruct() {
-        mysql_close($this->handle);
-    }
-	
+	function close() {
+		mysql_close($this->handle);
+		$this->connected = false;
+	}
+
 	public function begin() {
 		if (!$this->level) $this->execute("START TRANSACTION");
 		$this->level++;
@@ -47,10 +52,10 @@ class MySQL extends DB {
 
 class MySQLQuery extends Query {
 	
-	function __construct(DBMySQL $db, $query) {
+	function __construct(MySQL $db, $query) {
         parent::__construct($db, $query);
 		if (false===($this->handle = mysql_query($query, $db->handle))) {
-            throw new EDBMySQL($this->db->handle, $query);
+            throw new EMySQL($this->db->handle, $query);
 		}
 	}
 	

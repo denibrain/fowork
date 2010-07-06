@@ -118,6 +118,27 @@ class Element extends \FW\Object {
 		return $tag;
 	}
 	
+	function aItem(&$item, $key) {
+		if ($item instanceof ElementGroup) {
+			$els = array();
+			foreach($item as $el) {
+				$els[] = $this->toArray($el);
+			}
+			$item = $els;
+		}
+		else $item = iconv(FW_CHARSET, 'utf-8',$item);
+	}
+
+	function toArray($root) {
+		$loc = $root->items;
+		array_walk($loc, array($this, 'aItem'));
+		return $loc;
+	}
+	
+	function asJSON() {
+		return json_encode($this->toArray($this));
+	}
+	
 	static function lst($lst, $itemName = 'item', $groupName = 'list') {
 		$e = is_string($groupName) ? new Element($groupName) : $groupName;
 		foreach($lst as $id) $e->add(new Element($itemName, array('id' => $id)));
@@ -164,12 +185,16 @@ class ElementAttr extends ElItem {
 	}
 }
 
-class ElementGroup extends ElItem {
+class ElementGroup extends ElItem implements \IteratorAggregate {
 	
 	private $items;
 	private $count;
 	private $parentNode;
 	
+	public function getIterator() {
+		return new \ArrayIterator($this->items);
+	}
+
 	
 	function __construct($mixed, $parent) {
 		parent::__construct(is_string($mixed)?$mixed:$mixed->tag);

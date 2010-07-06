@@ -8,7 +8,7 @@ class Module extends \FW\App\Module {
 		if (!file_exists($f = FW_PTH_APP."forms/$name.php"))
 			throw new \Exception("Not found form $name ($f)");
 			
-		$form = new \FW\VCL\Form($name, $f);
+		$form = new \FW\VCL\Forms\Form($name, $f);
 		return $form;
 	}
 }

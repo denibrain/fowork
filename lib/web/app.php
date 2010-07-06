@@ -55,26 +55,6 @@ namespace FW\Web {
 			return $content;
 		}
 		
-		function proceedCommand($url) {
-			$this->activeContainer = $command = Command::factory($url);
-			
-			try {
-				$result = $command->execute(array_slice($url->domain, 2));
-			} catch (CommandException $e) {
-				$result = array('error'=>array('message'=>$e->getMessage(), 'code'=>$this->getCode()));
-			}
-		
-			foreach($result as $key => $list) 
-			if ($list) {
-				$l = $json->addGroup($key);
-				foreach($list as $item) $l->add($item);
-			}
-			
-			$content = new Content('json');
-			$content->body = (string)$json;
-			return $content;
-		}
-		
 		function proceedError(\ERequest $e) {
 			$this->activeContainer = $this->mm->Page;
 			return $this->mm->errorpage->error($e->getCode(), $e->getMessage());
@@ -89,9 +69,11 @@ namespace FW\Web {
 					
 					$url = $this->request->url;
 					$d = $url->domain[0];
-			
 					if ($d == 'co') $content = $this->proceedFile($url);
-					elseif ($d == 'cmd') $content = $this->proceedCommand($url);
+					elseif ($d == 'cmd') {
+						$this->activeContainer = $this->mm->Command;
+						$content = $this->activeContainer->compile($url->Local(1));
+					}
 					else {
 						$this->activeContainer = $this->mm->Page;
 						$content = $this->activeContainer->compile($url);

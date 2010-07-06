@@ -5,8 +5,8 @@ class ConsoleApp extends App {
 	public $script;
 	public $params;
 
-	public function __construct($root = false) {
-		parent::__construct($root);
+	public function __construct() {
+		parent::__construct();
 
 		global $argv;
 
