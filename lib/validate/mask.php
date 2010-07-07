@@ -3,14 +3,14 @@ namespace FW\Validate;
 
 class Mask extends Validator {
 
-	const TEXTLINE = "[\\\\\\/()\"!+:;'¹,.0-9A-Za-z\x7F-\xFF\\n\\r -]+$/";
+	const TEXTLINE = "/^[\\\\\\/()\"!+:;'¹,.0-9A-Za-z\x7F-\xFF\\n\\r -]+$/";
 	const TEXT = "/^[\\n\\r\\t*\\/()\"!:;'¹,.0-9A-Za-zà-ÿÀ-ß -]+$/s";
 	const INT = "/^[0-9]+$/";
 	const LATIN = "/^[a-zA-Z]+$/";
 	const LATINTEXT = "/^[a-zA-Z-\\s]+$/";
 	const NUMLATIN ="/^[0-9a-zA-Z-\\s]+$/";
-	const LETTERS = "/^([a-zà-ÿÀ-ß¸¨]+$/i";
-	const LETTERSEX = "/^([a-zà-ÿÀ-ß¸¨-]+$/i";
+	const LETTERS = "/^[a-zà-ÿÀ-ß¸¨]+$/i";
+	const LETTERSEX = "/^[a-zà-ÿÀ-ß¸¨-]+$/i";
 
 /*		"date"=>"[0-9]{2}[.-][0-9]{2}[.-][0-9]{4}",
 		"phone"=>RE_PHONE,

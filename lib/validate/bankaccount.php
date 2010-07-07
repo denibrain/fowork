@@ -16,18 +16,19 @@ class BankAccount extends Validator {
 	function calcCS($value) {
 		// 2. Вычисляется контрольная сумма со следующими весовыми 
 		//	  коэффициентами: (7,1,3,7,1,3,7,1,3,7,1,3,7,1,3,7,1,3,7,1,3,7,1)
+		echo "$value\n";
 		$a = array(7, 1, 3);
 		$total = 0;
 		$value = str_split($value);
-		array_walk($value, 
-			function($item, $key) use ($a, $total) { 
-				$total += $item * $a[$key % 3];
-			});
+		foreach($value as $key=>$item) {
+			$total = $total + $item * $a[$key % 3];
+			echo "$key: $item * {$a[$key % 3]} ($total)\n";
+		}
 		// 3. Вычисляется контрольное число как остаток от деления 
 		//    контрольной суммы на 10
 		// 4. Контрольное число сравнивается с нулём. В случае их 
 		//    равенства расчётного счёт считается правильным.
-		return $total % 10 != 0;
+		return $total % 10 == 0;
 	}
 
 	function checkSettAccount($value, $bik) {
@@ -48,8 +49,8 @@ class BankAccount extends Validator {
 	function validate($value) {
 		BankAccount::$Mask->validate($value);
 		if (isset($this->onBIK)) {
-			$bik = $this->onBIK();
-			if ($type == BankAccount::SETTLEMENT)
+			$bik = call_user_func($this->onBIK);
+			if ($this->type === BankAccount::SETTLEMENT)
 				$this->checkSettAccount($value, $bik);
 			else
 				$this->checkCorrAccount($value, $bik);

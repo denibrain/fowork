@@ -2,7 +2,8 @@
 namespace FW\Validate;
 
 class Enum extends Validator {
-	const MULTI = '/(\s|\r|\n)*(?:[,;](\s|\r|\n)*)?/m';
+	const MULTI = '/(\s|\r|\n)*[,;](\s|\r|\n)*/m';
+	const MULTIEX = '/(\s|\r|\n)*(?:[,;](\s|\r|\n)*)?/m';
 	const SPACE = '/\s+/';
 
 	private $itemValidator;

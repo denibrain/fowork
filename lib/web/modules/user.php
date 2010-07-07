@@ -1,4 +1,5 @@
 <?php
+use FW\VCL\Forms;
 
 class EInvalidSession extends \Exception {function __construct() {parent::__construct('Неверная сессия');}}
 class ESessionExpired extends \Exception {function __construct() {parent::__construct('Сессия закончилась');}}
@@ -176,8 +177,8 @@ class User extends \FW\Web\Module {
 		if (!($user = $this->dsUser($params)->getA()))
 			throw new E404();
 		
-		$form = new \FW\VCL\Form('changepass');
-		$form->add(new \FW\VCL\FBSubmit("изменить", "change"));
+		$form = new Forms\Form('changepass');
+		$form->add(new Forms\Button("изменить", "change"));
 		
 		if ($form->proceed() == $form::OK) {
 			$user['pass'] = (string)new \FW\Util\Password();

@@ -15,10 +15,10 @@ class Domain extends Validator {
 	}
 	
 	function validate($value) {
-		$domains = explode('.', $domain);
-		if ($maxLevel && $maxLevel < count($domains))
+		$domains = explode('.', $value);
+		if ($this->maxLevel && $this->maxLevel < count($domains))
 			throw new EValidate("Domain.maxLevel");
-		if ($minLevel && $minLevel > count($domains))
+		if ($this->minLevel && $this->minLevel > count($domains))
 			throw new EValidate("Domain.minLevel");
 
 		foreach($domains as $domain) 

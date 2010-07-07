@@ -17,7 +17,7 @@ class MailBox extends Validator {
 		if (false === ($pos = strpos($value, '@')))
 			throw new EValidate('Mailbox.part');
 		try {
-			$this->domainValidator.validate(substr($name, $pos + 1));
+			$this->domainValidator->validate(substr($value, $pos + 1));
 			$this->nameValidator->validate(substr($value, 0, $pos));
 		}
 		catch(EValidate $e) {

@@ -1,21 +1,24 @@
 <?php
 namespace FW\VCL\Forms;
+use \FW\Validate\Mask;
 
+/* 
+ * @property int $maxlen [RW] maximum input length
+ * @property int $minlen [RW] minimu length
+ */
 class Text extends FormField {
-	
 	private $maxlen = false;
 	private $minlen = false;
 
-	function __set($key, $value) {
-		switch($key) {
-			case 'maxlen': $this->maxlen = (int) $value; break;
-			case 'minlen': $this->minlen = (int) $value; break;
-			default:
-				parent::__set($key, $value);
-		}
-	}
-	
+	protected function setMaxlen($value) { $this->maxlen = (int) $value; }
+	protected function setMinlen($value) { $this->minlen = (int) $value; }
+	protected function getMaxlen() { return $this->maxlen; }
+	protected function getMinlen() { return $this->minlen; }
+	protected function setValue($value) { parent::setValue(trim($value)); }
+
 	function validate($value) {
+		if (!isset($this->validator)) 
+			$this->validator = new Mask(Mask::TEXTLINE);
 		parent::validate($value);
 		if (false!==$this->maxlen && strlen($value) > $this->maxlen)
 			throw new EFormData('FFTEXT.maxlen', $this->name);
