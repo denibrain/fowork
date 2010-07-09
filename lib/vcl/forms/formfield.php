@@ -16,6 +16,7 @@ class FormField extends FormElement {
 	private $type;
 
 	public $validator;
+	public $filter;
 
 	public function __construct($name, $caption, $type = FormField::REQUIRED,
 								$comment = '', $defValue = '') {
@@ -51,5 +52,9 @@ class FormField extends FormElement {
 	
 	protected function getName() { return $this->name; } 
 	protected function getValue() { return $this->value; }
-	protected function setValue($value) { $this->value = $value; }
+	protected function setValue($value) {
+		if (isset($this->filter))
+			$value = call_user_func($this->filter, $value);
+		$this->value = $value;
+	}
 }

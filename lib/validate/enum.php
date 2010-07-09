@@ -2,8 +2,8 @@
 namespace FW\Validate;
 
 class Enum extends Validator {
-	const MULTI = '/(\s|\r|\n)*[,;](\s|\r|\n)*/m';
-	const MULTIEX = '/(\s|\r|\n)*(?:[,;](\s|\r|\n)*)?/m';
+	const MULTI = '/(\s|\r|\n)*[,;](\s|\r|\n)*/';
+	const MULTIEX = '/(?:\s|\r|\n)+|(?:\s|\r|\n)*[,;](?:\s|\r|\n)*/';
 	const SPACE = '/\s+/';
 
 	private $itemValidator;
@@ -13,7 +13,6 @@ class Enum extends Validator {
 	function __construct($itemValidator, $separator = Enum::MULTI) {
 		$this->separator = $separator;
 		$this->itemValidator = $itemValidator;
-
 	}
 
 	function validate($value) {
@@ -22,7 +21,6 @@ class Enum extends Validator {
 			throw new EValidate('Enum.toomuch');
 		if ($this->minCount && $this->minCount > count($a))
 			throw new EValidate('Enum.toofew');
-
 		foreach($a as $name)
 			$this->itemValidator->validate($name);
 	}

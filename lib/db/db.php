@@ -134,12 +134,14 @@ class DB extends \FW\Object {
 		$format = array_shift($parameters);
 		$parameters['~@'] = $this->prefix;
 		$n = 0; $self = $this;
-		return preg_replace_callback(array('/:(\?|#[0-9]+)/', '/(~@)/'),
+		return preg_replace_callback(array('/:(\?|#([0-9]+))/', '/(~@)/'),
 			function ($regs) use ($parameters, &$n, $self) {
 				if ($regs[1] == '?') {
 					$regs[1] = $n;
 					++$n;
 				}
+				elseif (isset($regs[2])) $regs[1] = $regs[2];
+				
 				return $self->proceedValue($parameters[$regs[1]]);
 			}, $format);
 	}

@@ -11,6 +11,7 @@ class Domain extends Validator {
 
 	function __construct($maxLevel = 0, $type = Domain::ANY) {
 		$this->type = $type;
+		if ($type == Domain::REAL)  $this->minLevel = 2;
 		$this->maxLevel = $maxLevel;
 	}
 	
