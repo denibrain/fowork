@@ -24,6 +24,8 @@ class Whois extends \FW\Object {
 		"vg"	=>array("whois.adamsnames.tc", "is not registered."),
 		"ws"	=>array("whois.website.ws", "No match for ")
 	);
+	
+	static private $mask;
 
 	private static function QueryWhoisServer($whoisserver, $domain) {
 		$port = 43;
@@ -40,8 +42,12 @@ class Whois extends \FW\Object {
 		return $out;
 	}
 
+	static function init() {
+		self::$mask = new \FW\Validate\Domain(2, \FW\Validate\Domain::REAL);
+	}
+
 	static function GetDomainInfo($domain) {
-		\FW\Util\Validator::validate($domain, 'domain2level');
+		self::$mask->validate($domain);
 		list($name, $tld) = explode('.', $domain);
 
 		if (!isset(self::$whoisservers[$tld])) throw new ENoTld($tld);
@@ -61,6 +67,8 @@ class Whois extends \FW\Object {
 		return false;
 	}
 }
+
+Whois::init();
 
 class ENoTld extends \Exception {
 	function __construct($tld) {

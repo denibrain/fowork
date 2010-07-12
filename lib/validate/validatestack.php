@@ -6,10 +6,10 @@ class ValidateStack extends Validator {
 	private $stack = array();
 
 	function __construct() {
-		$name = 'FW\Validate';
+		$name = '\FW\Validate\Validator';
 		foreach(func_get_args() as $k=>$a) {
 			if (!($a instanceof $name))
-				throw new RValidate('Validator.system', 'INvalid argument $k');
+				throw new EValidate('Validator.system', 'INvalid argument $k');
 			$this->stack[] = $a;
 		}
 	}	

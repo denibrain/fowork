@@ -1,11 +1,11 @@
 <?php
-namesapce FW\Validate
+namespace FW\Validate;
 
 /* 
  * @property int $max [RW] maximum input length
  * @property int $min [RW] minimu length
  */
-class Length extends Validate  {
+class Length extends Validator  {
 
 	private $maxlen = false;
 	private $minlen = false;
