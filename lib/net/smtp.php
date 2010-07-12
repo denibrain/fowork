@@ -33,7 +33,7 @@ class SMTP extends Object {
 			$_SERVER['SERVER_NAME'] : 
 			'localhost.localdomain');
 		$this->helo_rply = null;
-		$this->log = new \FW\Util\Log('smtp');
+		$this->log = new \FW\Log\Log('smtp');
 
 		if ($connectTo) $this->Connect($connectTo);
 	}

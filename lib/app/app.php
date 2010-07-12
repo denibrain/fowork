@@ -59,7 +59,7 @@ class App extends \FW\Object {
 			if (preg_match('/^'.FW_LANGUAGE.'(\.[a-z]+)?\.php$/', $entry))
 				require FW_PTH_LOCALE."$entry";
 
-		$this->systemLog = new \FW\Util\Log('system');
+		$this->systemLog = new \FW\Log\Log('system');
 		$this->mm = new ModuleManager($this);
 		$this->xslt = new \FW\Text\XSLTransformer(FW_PTH_DESIGN."xsl/");
 		$this->txparser = new \FW\Text\Parser(FW_LIB.'/app/stx/caption.php');

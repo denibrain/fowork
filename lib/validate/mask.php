@@ -11,26 +11,18 @@ class Mask extends Validator {
 	const NUMLATIN ="/^[0-9a-zA-Z-\\s]+$/";
 	const LETTERS = "/^[a-zà-ÿÀ-ß¸¨]+$/i";
 	const LETTERSEX = "/^[a-zà-ÿÀ-ß¸¨-]+$/i";
-
-/*		"date"=>"[0-9]{2}[.-][0-9]{2}[.-][0-9]{4}",
-		"phone"=>RE_PHONE,
-		"phones"=>RE_PHONES,
-		"email"=> array(RE_MAILBOX, '', 'i'),
-		"emails"=> array(RE_MAILBOXES, '', 'i'),
-		"domain" => array(RE_DOMAIN,'', 'i'),
-		"domain2level" => array(RE_DOMAIN2LEVEL,'', 'i'),
-		"www" => array(RE_WWW,'', 'i'),
-		"ip" => RE_IP*/
-
+	const LOGIN = '/^[a-zA-Z0-9_.-]+$/';
+	const PASSWORD = '/[a-zA-Z0-9!@#$%^&*()\[\]|+=\/\\\\_-]+/';
 
 	private $mask;
+	public $matches;
 
 	function __construct($mask = Mask::TEXT) {
 		$this->mask = $mask;
 	}
 
 	function validate($value) {
-		if (!preg_match($this->mask, $value)) 
+		if (!preg_match($this->mask, $value, $this->matches)) 
 			throw new EValidate("Mask.mask");
 	}
 
