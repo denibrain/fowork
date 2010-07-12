@@ -4,34 +4,38 @@ namespace FW\Validate;
 class Date extends Mask {
 
 	private $dayIndex = false;
-	private $monthINdex = false;
-	private $yearMonth = false;
+	private $monthIndex = false;
+	private $yearIndex = false;
 
 	function __construct($format = "d.m.Y") {
 		$g = 0;
-		$self = $this;
-		$mask = preg_replace_callback("[dmY]", function($matches) use ($self, $g) {
+		$di = $mi = $yi = false;
+		echo $mask = preg_replace_callback("/[dmY]/", function($matches) use ($di, $mi, $yi, $g) {
 			$m = $matches[0];
 			if ($m === 'd') {
-				if ($self->dayIndex !== false) 
+				if ($di !== false) 
 					throw new EValidate('Validate.system', 'Day mask define already');
-				$this->dayIndex = ++$g;
+				$di = ++$g;
 				return "([0-9]{2})";
 			}
 			if ($m === 'm') {
-				if ($self->monthIndex !== false) 
+				if ($mi !== false) 
 					throw new EValidate('Validate.system', 'Day mask define already');
-				$this->monthIndex = ++$g;
+				$mi = ++$g;
 				return "([0-9]{2})";
 			}
 			if ($m === 'Y') {
-				if ($self->yearIndex !== false) 
+				if ($yi !== false) 
 					throw new EValidate('Validate.system', 'Day mask define already');
-				$this->yearIndex = ++$g;
+				$yi = ++$g;
 				return "([0-9]{4})";
 			}
 		}, preg_quote($format, '/'));
-		parent::__construct($mask);
+		
+		$this->dayIndex = $di;
+		$this->monthIndex = $mi;
+		$this->yearIndex = $yi;
+		parent::__construct("/^$mask\$/");
 	}
 
 	function __validate($value) {
