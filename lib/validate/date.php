@@ -10,7 +10,7 @@ class Date extends Mask {
 	function __construct($format = "d.m.Y") {
 		$g = 0;
 		$di = $mi = $yi = false;
-		echo $mask = preg_replace_callback("/[dmY]/", function($matches) use ($di, $mi, $yi, $g) {
+		$mask = preg_replace_callback("/[dmY]/", function($matches) use ($di, $mi, $yi, $g) {
 			$m = $matches[0];
 			if ($m === 'd') {
 				if ($di !== false) 

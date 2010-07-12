@@ -5,7 +5,6 @@ class Mask extends Validator {
 
 	const TEXTLINE = "/^[\\\\\\/()\"!+:;'¹,.0-9A-Za-z\x7F-\xFF\\n\\r -]+$/";
 	const TEXT = "/^[\\n\\r\\t*\\/()\"!:;'¹,.0-9A-Za-zà-ÿÀ-ß -]+$/s";
-	const INT = "/^[0-9]+$/";
 	const LATIN = "/^[a-zA-Z]+$/";
 	const LATINTEXT = "/^[a-zA-Z-\\s]+$/";
 	const NUMLATIN ="/^[0-9a-zA-Z-\\s]+$/";
@@ -13,6 +12,9 @@ class Mask extends Validator {
 	const LETTERSEX = "/^[a-zà-ÿÀ-ß¸¨-]+$/i";
 	const LOGIN = '/^[a-zA-Z0-9_.-]+$/';
 	const PASSWORD = '/[a-zA-Z0-9!@#$%^&*()\[\]|+=\/\\\\_-]+/';
+	const INT = '/^\d+$/';
+	const FLOAT = '/^\d+(?:\.\d+)?$/';
+	const CURRENCY = '/^\d+(?:\.\d{1,2})?$/';
 
 	private $mask;
 	public $matches;
