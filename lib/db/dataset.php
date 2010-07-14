@@ -277,6 +277,10 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 					case 'where': if (!$this->cond) $this->where[] = $this->expr; break;
 					case 'joincl': $this->tables[$this->tableAlias[$this->curTable]]['joincl'][] = $this->expr; break;
 					case 'having': if (!$this->cond) $this->having[] = $this->expr; break;
+					case 'order':
+						$order = (substr($this->expr, 0, 1) == '+'? ' ASC':' DESC'); 
+						$this->order[] = substr($this->expr, 1).$order;
+						break;
 				}
 				break;
 
@@ -285,6 +289,9 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$this->expr = 'CASE ';
 				break;
 				
+			case 'ordero':  # order clasure
+				$this->expr = substr($v, 0, 1);
+				break;
 			case 'open': # field set
 				$this->curField = new QueryField();
 				$this->expr = '';

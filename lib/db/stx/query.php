@@ -10,9 +10,9 @@ $this->terms = array(
 	'case'  => '\(\?',
     'deq'   => '==',
     'arrow' => '=>',
-	'open2a' => '\+\[',
-	'open2b' => '~\[',
-	'open2c' => '@\[',
+	'open2a' => '\|\[', // ADDON JOIN CLASUE
+	'open2b' => '~\[',  // REPLACE JOIN CLASUE
+	'open2c' => '&\[',  // HAVING
     'else'  => '\belse\b',
 	'cond'	=> '\?',
     'op3'   => '!in\b',
@@ -20,8 +20,10 @@ $this->terms = array(
 	'not'	=> '\bnot|any\b',
 	'limit'	=> '\#[0-9]+', # #1,5
 	'jnm'	=> "[*.]$dnm", # .closes
+	'ordero'=> "[+-]\[", # +(order+1)
 	'order'	=> "[+-]$dnm", # +order -time
 	'flag'	=> "@(?:[fmlrdsi]{1,2})", # @id
+	'groupo'	=> "@\[", # @id
 	'group'	=> "@$dnm", # @id
 	'typecast'=> "::[a-z][a-z0-9]*\b",
 	'alias'	=> ":[a-z][a-z0-9_]*\b", # @id
@@ -47,16 +49,16 @@ $this->maps = array();
 $this->maps['main'] = array(
 	'begin'		=> array('dist'=>'dist', 'dnm'=> 'maintable'),
 	'dist'		=> array('dnm'=> 'maintable'),
-	'maintable' => array(				 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset', 'alias'=>'mtalias' ),
-	'mtalias'	=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset'),
-	'table'		=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset', 'open2a,open2b'=>'+joincl,where', 'alias'=>'alias'),
-	'alias'		=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset', 'open2a,open2b'=>'+joincl,where'),
-	'joincl'	=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset'),
-	'fset'   	=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where'),
-	'where'  	=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where'),
-	'group'  	=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2c'=>'+having,where'),
-	'having'	=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end', 'open2c'=>'+having,where'),
-	'order'		=> array('jnm'=>'table', 'order'=>'order', 'limit'=>'limit', 'end'=>'end'),
+	'maintable' => array(				 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset', 'alias'=>'mtalias' ),
+	'mtalias'	=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset'),
+	'table'		=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset', 'open2a,open2b'=>'+joincl,where', 'alias'=>'alias'),
+	'alias'		=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset', 'open2a,open2b'=>'+joincl,where'),
+	'joincl'	=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where', 'open' => '+fset,fset'),
+	'fset'   	=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where'),
+	'where'  	=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2'=>'+where,where', 'open2c'=>'+having,where'),
+	'group'  	=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'group'=>'group', 'open2c'=>'+having,where'),
+	'having'	=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end', 'open2c'=>'+having,where'),
+	'order'		=> array('jnm'=>'table', 'order'=>'order', 'ordero'=>'+order,where', 'limit'=>'limit', 'end'=>'end'),
 	'limit'		=> array('z'=>'z', 'end'=>'end'),
 	'z' 		=> array('num'=>'offset'),
 	'offset' 	=> array('end'=>'end')
@@ -71,7 +73,7 @@ $this->maps['fset'] = array(
 	'next'		=> $op,
 	'unop' 		=> $unop,
 	'arg'		=> array('z' => 'next', 'close'=>'-', 'op,unop,mult,op2,op3'=>'operator', 'alias'=>'alias', 'typecast'=>'typecast',	'flag'=>'flag'),
-	'typecast'  => array('z' => 'next', 'close'=>'-', 'flag'=>'flag', 'alias'=>'alias'),
+	'typecast'  => array('z' => 'next', 'close'=>'-', 'op,unop,mult,op2,op3'=>'operator', 'flag'=>'flag', 'alias'=>'alias'),
 	'alias'		=> array('z' => 'next', 'close'=>'-', 'flag'=>'flag'),
 	'flag'		=> array('z' => 'next', 'close'=>'-'),
 	'any'		=> array('close'=>'-')

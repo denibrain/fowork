@@ -8,7 +8,7 @@ class Cases {
 	
 	const NOMINATIVE = 1;
 	const GENITIVE = 2;
-	const dative = 3;
+	const DATIVE = 3;
 	const accusative = 4;
 	const ablative = 5;
 	const prepositional = 6;

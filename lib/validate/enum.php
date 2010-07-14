@@ -5,6 +5,7 @@ class Enum extends Validator {
 	const MULTI = '/(\s|\r|\n)*[,;](\s|\r|\n)*/';
 	const MULTIEX = '/(?:\s|\r|\n)+|(?:\s|\r|\n)*[,;](?:\s|\r|\n)*/';
 	const SPACE = '/\s+/';
+	const NEWLINE = '/\r?\n/';
 
 	private $itemValidator;
 	public  $maxCount = 0;

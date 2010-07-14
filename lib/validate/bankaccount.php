@@ -16,13 +16,11 @@ class BankAccount extends Validator {
 	function calcCS($value) {
 		// 2. Вычисляется контрольная сумма со следующими весовыми 
 		//	  коэффициентами: (7,1,3,7,1,3,7,1,3,7,1,3,7,1,3,7,1,3,7,1,3,7,1)
-		echo "$value\n";
 		$a = array(7, 1, 3);
 		$total = 0;
 		$value = str_split($value);
 		foreach($value as $key=>$item) {
 			$total = $total + $item * $a[$key % 3];
-			echo "$key: $item * {$a[$key % 3]} ($total)\n";
 		}
 		// 3. Вычисляется контрольное число как остаток от деления 
 		//    контрольной суммы на 10

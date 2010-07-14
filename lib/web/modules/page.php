@@ -39,7 +39,7 @@ class Page extends FW\App\Module {
 		$ds = $this->dsActive(array('id'=>$this->id));
 		if (!(list($caption, $expression, $aclevel, $template) =  $ds->get()))
 			throw new E404();
-			
+
 		$this->caption = $this->app->resolve('*' == $caption ? "{".$expression."}" : $caption,
 			$this->params);
 
