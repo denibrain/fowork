@@ -128,7 +128,8 @@ class App extends \FW\Object {
 	}
 
 	function call($expr, $params, $prefix = 'display') {
-		$h = new THCall($params, $prefix);
+		$h = $params instanceof THCall ? $params : new THCall($params, $prefix);
+		$h->init();
 		$this->exparser->compile($expr, array($h, 'proceed'));
 		return $h->call();
 	}

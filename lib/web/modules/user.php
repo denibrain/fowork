@@ -115,7 +115,7 @@ class User extends \FW\Web\Module {
 		if (!$ds->count()) throw new Exception('Данный пользователь в системе не найден');
 		while ($data = $ds->getA()) {
 			$data['pass'] = (string)new FW\Util\Password();
-			$data['login'] = sprintf("a%05d", $data['id']);
+			$data['login'] = $data['id'];
 			$this->dpChangePassword($data['id'], $this->passhash($data['pass']));
 			$this->app->mailTo(array(E('fogot', $data), 2=>'user.Fogot.mail'), 'Востановление пароля', $data['email']);
 		}
@@ -182,7 +182,7 @@ class User extends \FW\Web\Module {
 		
 		if ($form->proceed() == $form::OK) {
 			$user['pass'] = (string)new \FW\Util\Password();
-			$user['login'] = sprintf("a%05d", $user['id']);
+			$user['login'] = $user['id'];
 			$pass =  $this->passhash($user['pass']);
 			$this->dpChangepassword($user['id'], $pass);
 			$this->app->mailTo(

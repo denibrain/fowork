@@ -24,16 +24,23 @@ class Command extends \FW\App\Module {
 		$h = new \FW\App\THCall($this->params, 'command');
 		try {
 			if ($expression) {
-				$status = $this->app->call($expression, $h);
+				$this->app->call($expression, $h)
+				$expression = explode(';', $expression);
+				
+				foreach($expression as $c) {
+					if (preg_match('/^([a-z0-9]+)=(.*)/', $c, $regs)) {
+						list(, $name, $c) = $regs;
+					} else $name = 'text';
+					$contents[$name] = $this->app->call($c, $h);
+				}
 			}
-			else $status = 'empty';
-			$result = E('response', A('status', $status));
+			$result = E('response', A('status', 'OK'), E('content', $contents));
 		}
 		catch (ERequest $e) {
 			throw $e;
 		}
 		catch (Exception $e) {
-			$result = E('response', A('status', 'error', 'message', $e->getMessage(), 'code', $e->getCode()));
+			$result = E('response', A('status', 'ERROR', 'message', $e->getMessage(), 'code', $e->getCode()));
 		}
 	
 		$content = new \FW\Web\Content('json');
