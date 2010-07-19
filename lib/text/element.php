@@ -27,8 +27,14 @@ class Element extends \FW\Object {
 	
 	private function addItem($e) {
 		$this->last = $e;
-		if (!isset($this->items[$e->tagName])) $this->items[$e->tagName] = new ElementGroup($e, $this);
-		else $this->items[$e->tagName]->add($e);
+		if (!isset($this->items[$e->tagName]))
+			$this->items[$e->tagName] = new ElementGroup($e, $this);
+		else {
+			if (!($this->items[$e->tagName] instanceof \FW\Text\ElementGroup)) {
+				throw new \Exception("Conflict names $e->tagName");
+			}
+			$this->items[$e->tagName]->add($e);
+		}
 		$e->rootNode = $e->rootNode;
 	}
 

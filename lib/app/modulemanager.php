@@ -11,6 +11,7 @@ class ModuleManager extends \FW\Object {
 		$this->app = $app;
 		$this->cache = array();
 		$this->path[0] = $path?$path:FW_PTH_APP.'modules/';
+		spl_autoload_register(array($this, 'load'));
 	}
 	
 	function addPath($path) {
@@ -44,6 +45,14 @@ class ModuleManager extends \FW\Object {
 		return $this->cache[$key] = new $classname($this->app);
 	}
 
+	function load($name) {
+		foreach($this->path as $path) {
+			$modulfile = $path.$name.'.php';
+			if (file_exists($modulfile)) {
+				require_once $modulfile;
+				return;
+			}
+		}
+		throw new \Exception("Module $name not found!");
+	}
 }
-
-?>

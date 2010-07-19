@@ -3,8 +3,6 @@ namespace FW\App;
 
 class EApp extends \Exception {}
 
-require FW_LIB."text/text.php";
-
 class App extends \FW\Object {
 	
 	static public $instance;
