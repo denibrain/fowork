@@ -20,19 +20,30 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	private $items = array();
 	private $id;
 	
-	public  $userCheck = NULL;
+	public $onCreate = null;
+	public $onFirstShow = null;
+	public $onCheck = null;
+	public $onSuccess = null;
+	public $onRefresh = null;
+	public $onError = null;
+	
 	private $errors;
+	public $owner;
+	public $autoProceed = false;
+	public $responce;
 
 	public function offsetExists($offset) { return $this->fields->offsetExists($offset); }
 	public function offsetGet($offset) { return $this->fields->$offset->value; }
 	public function offsetSet($offset, $value) { $this->fields->$offset->value = $value; }
 	public function offsetUnset($offset) { throw new \Exception("Cannot delete field"); }
 
-	function __construct($name, $elements = '') {
+	function __construct($name, $elements = '', $owner) {
 		parent::__construct($name);
 		$this->fields = new FormFields();
 		$this->buttons = new FormFields();
+		$this->owner = $owner;
 		if ($elements) include $elements;
+		if ($this->onCreate) call_user_func($this->onCreate, $form);
 	}
 	
 	function add(FormElement $e) {
@@ -47,7 +58,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	static function handleForm() {
 		if (!isset($_POST['_form'])) return null;
 		list($m, $f) = explode('.', $_POST['_form']);
-		return \FW\App\App::$instance->mm->$m->form($f);
+		return \FW\App\App::$_->mm->$m->form($f);
 	}
 		
 	function proceed($auxData = false) {
@@ -70,21 +81,33 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 				$this->status = Form::ERROR;
 			}
 			else {
-				if ($this->pressedButton->type == 'submit')
-					$this->status =  $this->check($auxData) ? Form::OK : Form::ERROR;
-				else {
-					if ($this->id && $this->detectRefresh &&
-						$_SESSION['form'][$this->name]['id'] === $this->id)
-						$this->status = Form::REFRESH;
-					else
-						$this->status = Form::OK;
+				if ($this->id && $this->detectRefresh &&
+					$_SESSION['form'][$this->name]['id'] === $this->id
+				) {
+					$this->status = Form::REFRESH;
+					if ($this->onRefresh) $this->responce = call_user_func($this->onRefresh, $this);
 				}
+				if ($this->pressedButton->type == 'submit')
+					$this->status =  $this->responce = $this->check($auxData) ? Form::OK : Form::ERROR;
+				else
+					$this->status = Form::OK;
 			}
 		} else {
 			$this->status = Form::NONE;
+			if ($this->onFirstShow) $this->responce = call_user_func($this->onFirstShow, $this);
 		}
+
 		if ($this->status != Form::OK)
 			$_SESSION['form'][$this->name]['id'] = $this->id = md5(microtime());
+			
+		switch ($this->status) {
+			case Form::OK:
+				if ($this->onSuccess) $this->responce = call_user_func($this->onSuccess, $this);
+				break;
+			case Form::ERROR:
+				if ($this->onError) $this->responce = call_user_func($this->onError, $this);
+				break;
+		}
 		return $this->status;
 	}
 	
@@ -111,7 +134,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 			}
 		}
 		try {
-			if (isset($this->userCheck)) call_user_func($this->userCheck, $this);
+			if (isset($this->onCheck)) call_user_func($this->onCheck, $this);
 		}
 		catch (EFormData $e) {
 			$this->errors[] = array('code'=> $e->code, 'field'=>$e->field, 'text'=>$e->getMessage());

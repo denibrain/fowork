@@ -30,12 +30,12 @@ class THCall extends \FW\Object {
 			case 'vl':
 				list($cl, $v) = explode(':', $v);
 				if ($proc->state == 'expr') {
-					$this->result =  App::$instance->mm->$cl->$v;
+					$this->result =  App::$_->mm->$cl->$v;
 					$this->template = "$cl.$v";
 					$this->class = $v;
 				}
 				else
-					$this->params[$this->paramName] = App::$instance->mm->$cl->$v;
+					$this->params[$this->paramName] = App::$_->mm->$cl->$v;
 				break;
 			case 'nm':
 				if ($proc->state == 'eq') {
@@ -67,7 +67,7 @@ class THCall extends \FW\Object {
 				if (false===$this->result) {
 					$class = $this->class;
 					$method = $this->prefix.$this->method;
-					$this->result = App::$instance->mm->$class->$method($this->params);
+					$this->result = App::$_->mm->$class->$method($this->params);
 				}
 				break;
 		}
@@ -79,7 +79,7 @@ class THCall extends \FW\Object {
 	
 	function content() {
 		if ($this->template === false) return $this->result;
-		return App::$instance->transform($this->result, $this->template);
+		return App::$_->transform($this->result, $this->template);
 	}
 	
 	

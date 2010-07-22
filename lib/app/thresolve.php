@@ -33,9 +33,9 @@ class THResolve extends \FW\Object {
 			case 'vl':
 				list($class, $v) = explode(':', $v);
 				if ($proc->state == 'expr') 
-					$this->text .= App::$instance->mm->$class->$v;
+					$this->text .= App::$_->mm->$class->$v;
 				else 
-					$this->params[$this->paramName] = App::$instance->mm->$class->$v;
+					$this->params[$this->paramName] = App::$_->mm->$class->$v;
 				break;
 			
 			case 'nm':
@@ -68,7 +68,7 @@ class THResolve extends \FW\Object {
 				if ($proc->state=='vl')  break;
 				$class = $this->class;
 				$method = $this->prefix.$this->method;
-				$this->text .= App::$instance->mm->$class->$method($this->params);
+				$this->text .= App::$_->mm->$class->$method($this->params);
 				break;
 		}
 	}

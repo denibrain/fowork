@@ -9,7 +9,7 @@ class DB extends Log {
 			if (is_object($db)) $this->handle = $db;
 			else $this->handle = DB::connect($db);
 		}
-		else $this->handle = App::$instance->db;
+		else $this->handle = App::$_->db;
 	}
 	
 	function write($str) {

@@ -7,7 +7,7 @@ class Mask extends Validator {
 	const TEXT = "/^[\\n\\r\\t*\\/()\"!:;'¹,.0-9A-Za-zà-ÿÀ-ß -]+$/s";
 	const LATIN = "/^[a-zA-Z]+$/";
 	const LATINTEXT = "/^[a-zA-Z-\\s]+$/";
-	const NUMLATIN ="/^[0-9a-zA-Z-\\s]+$/";
+	const NUMLATIN ="/^[0-9a-zA-Z_-]+$/";
 	const LETTERS = "/^[a-zà-ÿÀ-ß¸¨]+$/i";
 	const LETTERSEX = "/^[a-zà-ÿÀ-ß¸¨-]+$/i";
 	const LOGIN = '/^[a-zA-Z0-9_.-]+$/';

@@ -1,5 +1,5 @@
 <?php
-class Command extends \FW\App\Module {
+class Content extends \FW\App\Module {
 	
 	private $id;
 	private $params;
@@ -19,32 +19,26 @@ class Command extends \FW\App\Module {
 
 		if (!(list($expression, $acLevel) = $this->dsActive(array('id'=>$this->id))->get()))
 			throw new E404();
+
+		$content = new \FW\Web\Content('html');
 		
 		$this->app->checkLevel($acLevel);
-		$h = new \FW\App\THCall($this->params, 'command');
+		$h = new \FW\App\THCall($this->params, 'content');
 		try {
 			if ($expression) {
-				$this->app->call($expression, $h)
-				$expression = explode(';', $expression);
-				
-				foreach($expression as $c) {
-					if (preg_match('/^([a-z0-9]+)=(.*)/', $c, $regs)) {
-						list(, $name, $c) = $regs;
-					} else $name = 'text';
-					$contents[$name] = $this->app->call($c, $h);
-				}
+				$body = $this->app->content($expression, $h);
 			}
-			$result = E('response', A('status', 'OK'), E('content', $contents));
+			else $body = '';
 		}
 		catch (ERequest $e) {
 			throw $e;
 		}
 		catch (Exception $e) {
-			$result = E('response', A('status', 'ERROR', 'message', $e->getMessage(), 'code', $e->getCode()));
+			$content->code = 400;
+			$body = $e->getMessage();
 		}
 	
-		$content = new \FW\Web\Content('json');
-		$content->body = $result->asJSON();
+		$content->body = $body;
 		return $content;
 	}
 }

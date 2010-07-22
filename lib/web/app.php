@@ -74,6 +74,10 @@ namespace FW\Web {
 						$this->activeContainer = $this->mm->Command;
 						$content = $this->activeContainer->compile($url->Local(1));
 					}
+					elseif ($d == 'txt') {
+						$this->activeContainer = $this->mm->Content;
+						$content = $this->activeContainer->compile($url->Local(1));
+					}
 					else {
 						$this->activeContainer = $this->mm->Page;
 						$content = $this->activeContainer->compile($url);

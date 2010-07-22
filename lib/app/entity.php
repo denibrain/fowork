@@ -11,7 +11,7 @@ class Entity extends \FW\Object {
 	protected $config;
 
 	public function __construct() {
-		$this->app = App::$instance;
+		$this->app = App::$_;
 
 		$this->classname = strtolower(get_class($this));
 		
@@ -32,7 +32,7 @@ class Entity extends \FW\Object {
 	function __call($name, $args) {
 		$pr = substr($name, 0, 2);
 		$funcName = strtolower(substr($name, 2));
-		$db = App::$instance->db;
+		$db = App::$_->db;
 		if ($pr == 'ds') {
 			if (!isset($this->dataset[$funcName]))
 				throw new \Exception("No Dataset $funcName in module $this->classname");

@@ -10,7 +10,7 @@ class Cell extends Entity {
 		if (is_array($id)) $this->set($id);
 		if ($id) $this->select($id);
 
-		$this->app = App::$instance;
+		$this->app = App::$_;
 		$this->classname = strtolower(get_class($this));
 		
 		$f = FW_PTH_APP."{$this->classname}.db.php";

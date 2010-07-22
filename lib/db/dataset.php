@@ -91,7 +91,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 	}
 	
 	public function __construct($query, $params = array(), $db = null) {
-		$this->db = !$db ? \FW\App\App::$instance->db : $db;
+		$this->db = !$db ? \FW\App\App::$_->db : $db;
 		
 		$this->params = $params;
 
@@ -193,7 +193,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 		if (false!==$this->limit) $sql.= " LIMIT $this->limit";
 		if (false!==$this->offset) $sql.= " OFFSET $this->offset";
 		
-		//\FW\App\App::$instance->log("[$sql<br/>]");
+		//\FW\App\App::$_->log("[$sql<br/>]");
 		return $sql;
 	}
 	

@@ -13,7 +13,7 @@ class Mail extends Log {
 			if (is_object($mt)) $this->handle = $mt;
 			else $this->handle = MailTransport::factory($mt);
 		}
-		else $this->handle = App::$instance->mt;
+		else $this->handle = App::$_->mt;
 	}
 
 	function write($str) {

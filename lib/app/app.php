@@ -5,7 +5,7 @@ class EApp extends \Exception {}
 
 class App extends \FW\Object {
 	
-	static public $instance;
+	static public $_;
 	
 	private $db; // main DB connection 
 	private $mt; // main Mail Transport
@@ -20,7 +20,7 @@ class App extends \FW\Object {
 	}
 	
 	public function __construct($root = false) {
-		self::$instance = $this;
+		self::$_ = $this;
 
 		define('FW_ROOT', $root ? $root : $this->approot);
 		if (!defined('FW_PTH_ETC')) define('FW_PTH_ETC', FW_ROOT.'etc/');

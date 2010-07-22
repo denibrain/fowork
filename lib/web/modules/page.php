@@ -184,7 +184,7 @@ class Page extends FW\App\Module {
 		$ds->where = "parent_id = ANY (:parents)";
 		if ($onmenu) $params['onmenu'] = true;
 
-		//$params['aclevels'] = \App::$instance->user->groups;
+		//$params['aclevels'] = App::$_->user->groups;
 		
 		$ds = $this->dsMap($params);
 		
