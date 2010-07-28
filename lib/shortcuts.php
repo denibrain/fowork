@@ -16,6 +16,17 @@ function A() {
 	return $result;
 }
 
+function D($object, $fields) {
+	$a = array();
+	if (is_string($fields))
+		$fields = explode(',', $fields);
+	if (is_object($object)) {
+		foreach($fields as $key) $a[$key] = $object->$key;
+	} else
+		foreach($fields as $key) $a[$key] = $object[$key];
+	return $a;
+}
+
 function he($a) { return T($a)->html; }
 function remle($a) { return T($a)->remEOL(); }
 function fixle($a) { return T($a)->setEOL(); }
