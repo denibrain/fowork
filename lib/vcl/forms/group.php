@@ -14,7 +14,7 @@ class Group extends FormElement {
 	
 	function add($el) {
 		$el->form = $this->form;
-		if ($el instanceof FormField) $this->form->fields->add($el);
+		if ($el instanceof Field) $this->form->fields->add($el);
 		$this->items[] = $el;
 	}
 	

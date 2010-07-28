@@ -14,6 +14,8 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	private $detectRefresh = false;
 	
 	private $status = Form::NONE;
+	public $autoProceed = false;
+	public $responce;
 	
 	private $fields;
 	private $buttons;
@@ -28,31 +30,24 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	public $onError = null;
 	
 	private $errors;
-	public $owner;
-	public $autoProceed = false;
-	public $responce;
 
 	public function offsetExists($offset) { return $this->fields->offsetExists($offset); }
 	public function offsetGet($offset) { return $this->fields->$offset->value; }
 	public function offsetSet($offset, $value) { $this->fields->$offset->value = $value; }
 	public function offsetUnset($offset) { throw new \Exception("Cannot delete field"); }
 
-	function __construct($name, $elements = '', $owner) {
-		parent::__construct($name);
-		$this->fields = new FormFields();
-		$this->buttons = new FormFields();
-		$this->owner = $owner;
+	function __construct($name, $owner) {
+		parent::__construct($name, $owner);
+		$this->fields = new \FW\VCL\Controls();
+		$this->buttons = new \FW\VCL\Controls();
 		if ($elements) include $elements;
 		if ($this->onCreate) call_user_func($this->onCreate, $form);
 	}
 	
-	function add(FormElement $e) {
-		$e->form = $this;
-		$f = "\FW\VCL\Forms\FormField";
-		$b = "\FW\VCL\Forms\Button";
-		if ($e instanceof $f) $this->fields->add($e);
-		elseif ($e instanceof $b) $this->buttons->add($e);
-		return $this->items[] = $e;
+	function add($control) {
+		parnet::__add($control);
+		if ($control instanceof \FW\VCL\Forms\Field) $this->fields->add($e);
+		elseif ($control instanceof \FW\VCL\Forms\Button) $this->buttons->add($e);
 	}
 	
 	static function handleForm() {
@@ -142,37 +137,21 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 		return !count($this->errors);
 	}
 
-	function display($data = array()) {
-		$e = E('form',
-			A('caption', $this->caption,
-			  'name', $this->name,
-			  'id', $this->id,
-			  'action', $this->action,
-			  'method', $this->method));
+	function display() {
+		$skeleton = parent::display();
+		$skeleton->add(D($this, 'caption,action,method'));
 		
-		if ($data) $this->loadValues($data);
-		
-		foreach($this->items as $item) $e->add($item->display());
 		if ($this->errors) {
 			foreach($this->errors as $error) $e->add(E('error', $error));
 		}
 		return $e;
 	}
 	
-	function __get($key) {
-		switch ($key) {
-			case 'name': return $this->name;
-			case 'method': return $this->method;
-			case 'status': return $this->status;
-			case 'fields': return $this->fields;
-			case 'pressedButton': return $this->pressedButton;
-			
-			default:
-				parent::__get($key);
-		}
-	}	
+	function getMethod() { return $this->method; }
+	function getStatus() { return $this->status; }
+	function getFields() { return $this->fields; }
+	function getPressedButton() { return $this->pressedButton; }
 }
-
 }
 
 namespace {

@@ -1,9 +1,9 @@
 <?php
 namespace FW\VCL\Forms;
 
-class Checkbox extends FormField {
+class Checkbox extends Field {
 
-	public function __construct($name, $caption, $req = FormField::REQUIRED,
+	public function __construct($name, $caption, $req = Field::REQUIRED,
 								$comment = '', $defValue = 0) {
 		parent::__construct($name, $caption, $req, $comment, (int)(!!$defValue));
 	}

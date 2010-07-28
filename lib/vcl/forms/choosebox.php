@@ -2,7 +2,7 @@
 namespace FW\VCL\Forms;
 
 
-class ChooseBox extends FormField implements \ArrayAccess, \IteratorAggregate {
+class ChooseBox extends Field implements \ArrayAccess, \IteratorAggregate {
 	private $options = array();
 
 	public function offsetExists($offset) { return isset($this->options[$offset]); }

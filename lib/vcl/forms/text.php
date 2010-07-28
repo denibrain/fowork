@@ -2,7 +2,7 @@
 namespace FW\VCL\Forms;
 use \FW\Validate\Mask;
 
-class Text extends FormField {
+class Text extends Field {
 	protected function setValue($value) { parent::setValue(trim($value)); }
 
 	function validate($value) {

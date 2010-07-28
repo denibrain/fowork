@@ -1,9 +1,9 @@
 <?php
 namespace FW\VCL;
 class FFComoboBox extends FFList {}
-class FFDate extends FormField {}
-class FFTime extends FormField {}
-class FFInt extends FormField {
+class FFDate extends Field {}
+class FFTime extends Field {}
+class FFInt extends Field {
 	function validate($value) {
 		parent::validate($value);
 
@@ -12,8 +12,16 @@ class FFInt extends FormField {
 	}	
 }
 
-class FFFloat extends FormField {}
-class FFCurrency extends FFFloat {}
+class Float extends Field {
+	function __construct($name, $owner) {
+		parent::__construct($owner);
+		$this->filter = function ($value) {
+			return $value(str_replace(array(' ', ','), array('', '.'), $subject));
+		};
+		$this->validator = new \FW\Validate\Mask(\FW\Validate\Mask::FLOAT);
+	}
+}
+
 class FFFile extends FFList {
 
 	private $minsize = false;

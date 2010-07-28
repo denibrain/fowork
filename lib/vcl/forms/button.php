@@ -1,7 +1,7 @@
 <?php
 namespace FW\VCL\Forms;
 
-class Button extends FormElement {
+class Button extends \FW\VCL\Component {
 
 	const CUSTOM = 'button';
 	const SUBMIT = 'submit';
@@ -12,10 +12,9 @@ class Button extends FormElement {
 	private $name;
 	protected $type;
 	
-	function __construct($caption, $name = '', $type = Button::SUBMIT) {
-		$this->caption = $caption;
-		$this->name = $name;
-		$this->type = $type;
+	function __construct($name) {
+		$this->family = 'button';
+		$this->type = Button::SUBMIT;
 	}
 	
 	function display() {

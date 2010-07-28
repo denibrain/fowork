@@ -1,7 +1,7 @@
 <?php
 namespace FW\VCL\Grid;
 
-class Column extends \FW\Object {
+class Column extends \FW\VCL\Component {
 	private $name;
 	private $width;
 	private $sort;
@@ -22,26 +22,20 @@ class Column extends \FW\Object {
 	const SORTASC = 1;
 	const SORTDESC = 2;
 
-	function __construct($name, $caption = '', 
-		$width = Column::ANY, $align = Column::LEFT, $sort = Column::SORTNONE) {
-		$this->name = $name;		
-		$this->width = $width;		
-		$this->caption = $caption;		
-		$this->align = $align;		
-		$this->sort = $sort;		
+	function __construct($name, $caption = '', $width = Column::ANY, 
+			$align = Column::LEFT, $sort = Column::SORTNONE) {
+		parent::__construct($name);
+
+		$this->family = 'col';
+		$this->caption = $caption;
+		$this->width = $width;
+		$this->align = $align;
+		$this->sort = $sort;
 	}
 
 	function display() {
-		return E('col', A(
-			'name', $this->name,
-			'width', $this->width,
-			'caption',$this->caption,
-			'align', $this->align,
-			'sort', $this->sort
-		));
-
+		$skeleton = parent::display();
+		$skeleton->add(D($this, 'width,caption,align,sort'));
+		return $skeleton;
 	}
-
-	function getName() { return $this->name; }
-
 }
