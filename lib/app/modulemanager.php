@@ -37,7 +37,6 @@ class ModuleManager extends \FW\Object {
 				if (file_exists($modulfile)) {
 					require_once $modulfile;
 					$cls = new $classname($this->app);
-					$classname::$_ = $cls;
 					return $this->cache[$key] = $cls;
 				}
 				
