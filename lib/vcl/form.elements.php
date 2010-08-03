@@ -22,14 +22,4 @@ class Float extends Field {
 	}
 }
 
-class FFFile extends FFList {
-
-	private $minsize = false;
-	private $maxsize = false;
-	private $mimes = array();
-	
-	function validate($value) {
-		
-	}
-}
 ?>

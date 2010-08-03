@@ -83,14 +83,6 @@ class User extends \FW\Web\Module {
 		return $this->dpCreate($name, $this->passhash($pass), $email, $type);
 	}
 	
-	function onLogin($form) {
-		$values = $form->getValues();
-		$params['login'] = (int)substr($values['uid'], 1);
-		$params['type'] = substr($values['uid'], 0, 1);
-		$params['pass'] = $values['pass'];
-		$this->login($params);
-	}
-	
 	function login($params) {
 		$params['pass'] = $this->passhash($params['pass']);
 		if (!($userinfo = $this->dsLogin($params)->get()))
@@ -132,18 +124,6 @@ class User extends \FW\Web\Module {
 		$this->logout();
 		throw new ERedirect('login');
 		return E('quit');
-	}
-
-	function displayLogin() {
-		if($this->id)
-			throw new ERedirect(substr($r = $_SERVER['REQUEST_URI'], 0, strpos($r, '/') + 1));
-		
-		$form = $this->form('login');
-	
-		if ($form->proceed() == $form::OK) 
-			throw new ERedirect($_SERVER['REQUEST_URI']);
-		else
-			return E('login', $form->display());
 	}
 
 	function displayFogot() {

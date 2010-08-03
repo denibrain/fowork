@@ -2,7 +2,7 @@
 namespace FW\App;
 
 class Entity extends \FW\Object {
-	
+
 	protected $app;
 	private $classname;
 	

@@ -9,29 +9,22 @@ class Button extends \FW\VCL\Component {
 	const CANCEL = 'cancel';
 	
 	private $caption;
-	private $name;
 	protected $type;
 	
-	function __construct($name) {
+	function __construct($name, $caption = '', $type = Button::SUBMIT) {
+		parent::__construct($name);
 		$this->family = 'button';
-		$this->type = Button::SUBMIT;
+		$this->caption = $caption;
+		$this->type = $type;
 	}
 	
 	function display() {
-		return E('button', A(
-			'type', $this->type,
-			'caption', $this->caption,
-			'name', $this->name
-		));
+		$skeleton = parent::display();
+		$skeleton->add(D($this, 'caption,type'));
+		return $skeleton;
 	}
-	
-	function __get($key) {
-		switch ($key) {
-			case 'name': return $this->name;
-			case 'type': return $this->type;
-			default:
-				return parent::__get($key);
-		}
-	}
+
+	function getType() {return $this->type;}
+	function getCaption() {return $this->caption;}
 }
 

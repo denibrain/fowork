@@ -2,13 +2,11 @@
 namespace FW\VCL;
 
 class Component extends \FW\Object {
-	public $name;
-	public $params;
+	private $name;
 	private $controls;
-
 	private $className;
 	protected $family;
-	public $id;
+	private $visible;
 	private $owner;
 
 	/**
@@ -20,19 +18,33 @@ class Component extends \FW\Object {
 		$this->name = $name;
 		$this->owner = null;
 		$this->controls = new Controls();
+		$this->visible = true;
 
-		$this->className = strtolower(substr(get_class($this)));
-
-		$this->id = "{$this->className}_$this->name}";
-		if (isset($_SESSION[$this->fullname])) $this->params = $_SESSION[$this->fullname];
-		else $this->params = array();
+		$this->className = strtolower(get_class($this));
+		$pos = \strrpos($this->className, '\\');
+		if ($pos !== false) $this->className = substr($this->className, $pos + 1);
 	}
-	
+
 	function display() {
-		$skeleton = E($this->family, D($this, 'id,name'), A('class', $this->className));
+		$skeleton = E($this->family, D($this, 'id,name,visible'), A('class', $this->className));
 		foreach($this->controls as $item)
 			$skeleton->add($item->display());
+		
+		$this->customDisplay($skeleton);
+
 		return $skeleton;
+	}
+
+	function customDisplay($skeleton) {
+
+	}
+
+	function hideInsiders() {
+		foreach($this->controls as $item) $item->hide();
+	}
+
+	function hide() {
+		$this->visible = false;
 	}
 
 	/**
@@ -40,16 +52,47 @@ class Component extends \FW\Object {
 	 * @param \FW\VCL\Component $control Some control to add
 	 */
 	function add($control) {
-		$this->controls->add($control);
 		$control->owner = $this;
+		$this->controls->add($control);
+		return $control;
 	}
 
-	function __destruct() {
-		$_SESSION[$this->fullname] = $this->params;
+	function remove($control) {
+		if (\is_string($control)) $control = $this->controls->$control;
+		$control->owner = null;
+		$this->controls->remove($control);
+		return $control;
 	}
 
-	function getId() { return (isset($this->owner) ? $this->owner->id.'.' : '' ).$this->id; }
+	/**
+	 * Perform a event for object with ID = sender
+	 * @param string $sender
+	 * @param string $event
+	 * @param array $data
+	 * @return void
+	 */
+	function perform($sender, $event, $data) {
+		if ($sender === $this->id) {
+			$this->handleEvent($event, $data);
+		}
+		else {
+			/* @var $control FW\VCL\Component */
+			$control = $this->controls->getById($sender);
+			if ($control) {
+				$control->perform($sender, $event, $data);
+			}
+		}
+	}
+
+	function handleEvent($event, $data) {
+		$handler = 'do'.$event;
+		if (\method_exists($this, $handler))
+			$this->$handler($data);
+	}
+
+	function getId() { return (isset($this->owner) ? $this->owner->id.'.' : '' ).$this->name; }
 	function getName() {return $this->name;}
+	function getVisible() {return $this->visible;}
 	function getControls() {return $this->controls;}
 	function getClassName() {return $this->className;}
 	function getOwner() {return $this->owner;}

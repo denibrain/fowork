@@ -62,6 +62,24 @@ class App extends \FW\Object {
 		$this->xslt = new \FW\Text\XSLTransformer(FW_PTH_DESIGN."xsl/");
 		$this->txparser = new \FW\Text\Parser(FW_LIB.'/app/stx/caption.php');
 		$this->exparser = new \FW\Text\Parser(FW_LIB.'/app/stx/call.php');
+
+		spl_autoload_register(array($this, 'componentLoad'));
+	}
+
+	function componentLoad($name) {
+		$pos = strpos($name, '\\');
+		if ($pos === 0) {
+			$name = substr($name, 1);
+			$pos = strpos($name, '\\', 1);
+		}
+		if (false!==$pos) {
+			$dName = \strtolower(substr($name, 0, $pos));
+			if ($dName ==='page' || $dName ==='grid' || $dName ==='form') {
+				$fileName =  FW_PTH_COMPONENTS.\strtolower(\str_replace('\\', '/', $name)).'.php';
+				if (file_exists($fileName))
+					require $fileName;
+			}
+		}
 	}
 
 	function __destruct() {

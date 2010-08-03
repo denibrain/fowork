@@ -4,7 +4,7 @@ namespace FW\VCL\Forms;
 /* @property string $name [R] Name of field
  * @property string $value [RW] value of field;
  */
-class Field extends FormElement {
+class Field extends \FW\VCL\Component {
 	const REQUIRED = 0x01;
 	const OPTIONAL = 0x00;
 	
@@ -16,10 +16,13 @@ class Field extends FormElement {
 	public $validator;
 	public $filter;
 
-	public function __construct($name) {
+	public function __construct($name, $caption = '', $required = Field::REQUIRED, $comment = '', $value = '') {
 		parent::__construct($name);
 		$this->family = 'field';
-		$this->require = Field::REQUIRED;
+		$this->caption = $caption;
+		$this->require = $required;
+		$this->comment = $comment;
+		$this->value = $value;
 	}
 
 	/* check value, if error exists then throw exception */
@@ -36,13 +39,15 @@ class Field extends FormElement {
 
 	function display() {
 		$skeleton = parent::display();
-		$skeleton->add(D($this, array('type', 'require,caption,value,comment')));
+		$skeleton->add(D($this, 'require,caption,value,comment'));
 		return $skeleton;
 	}
-	
-	protected function getName() { return $this->name; } 
-	protected function getValue() { return $this->value; }
-	protected function setValue($value) {
+
+	function getComment() { return $this->comment; }
+	function getCaption() { return $this->caption; }
+	function getRequire() { return $this->require; }
+	function getValue() { return $this->value; }
+	function setValue($value) {
 		if (isset($this->filter))
 			$value = call_user_func($this->filter, $value);
 		$this->value = $value;

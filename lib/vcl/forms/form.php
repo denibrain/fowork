@@ -20,7 +20,6 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	private $fields;
 	private $buttons;
 	private $items = array();
-	private $id;
 	
 	public $onCreate = null;
 	public $onFirstShow = null;
@@ -36,18 +35,18 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	public function offsetSet($offset, $value) { $this->fields->$offset->value = $value; }
 	public function offsetUnset($offset) { throw new \Exception("Cannot delete field"); }
 
-	function __construct($name, $owner) {
-		parent::__construct($name, $owner);
+	function __construct($name) {
+		parent::__construct($name);
+		$this->family = 'form';
 		$this->fields = new \FW\VCL\Controls();
 		$this->buttons = new \FW\VCL\Controls();
-		if ($elements) include $elements;
 		if ($this->onCreate) call_user_func($this->onCreate, $form);
 	}
 	
 	function add($control) {
-		parnet::__add($control);
-		if ($control instanceof \FW\VCL\Forms\Field) $this->fields->add($e);
-		elseif ($control instanceof \FW\VCL\Forms\Button) $this->buttons->add($e);
+		if ($control instanceof \FW\VCL\Forms\Field) $this->fields->add($control);
+		elseif ($control instanceof \FW\VCL\Forms\Button) $this->buttons->add($control);
+		return parent::add($control);
 	}
 	
 	static function handleForm() {
@@ -63,8 +62,8 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 					array_merge($_POST, $_FILES):$_GET;
 				$this->id = $_POST['_id'];
 			}
-			else
-				$this->id = false;
+			//else
+			//	$this->id = false;
 				
 			$this->pressedButton = false;
 			foreach($this->buttons as $name => $button) if (isset($auxData[$name])) {
@@ -76,7 +75,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 				$this->status = Form::ERROR;
 			}
 			else {
-				if ($this->id && $this->detectRefresh &&
+				if ($this->detectRefresh &&
 					$_SESSION['form'][$this->name]['id'] === $this->id
 				) {
 					$this->status = Form::REFRESH;
@@ -92,8 +91,8 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 			if ($this->onFirstShow) $this->responce = call_user_func($this->onFirstShow, $this);
 		}
 
-		if ($this->status != Form::OK)
-			$_SESSION['form'][$this->name]['id'] = $this->id = md5(microtime());
+//		if ($this->status != Form::OK)
+			//$_SESSION['form'][$this->name]['id'] = $this->id = md5(microtime());
 			
 		switch ($this->status) {
 			case Form::OK:
@@ -104,6 +103,10 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 				break;
 		}
 		return $this->status;
+	}
+
+	function doSubmit($data) {
+		$this->proceed($data);
 	}
 	
 	function loadValues($data, $checkempty = false) {
@@ -128,6 +131,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 				$this->errors[] = array('code'=> $e->code, 'field'=>$e->field, 'text'=>$e->getMessage());
 			}
 		}
+		if (!$this->errors)
 		try {
 			if (isset($this->onCheck)) call_user_func($this->onCheck, $this);
 		}
@@ -142,11 +146,13 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 		$skeleton->add(D($this, 'caption,action,method'));
 		
 		if ($this->errors) {
-			foreach($this->errors as $error) $e->add(E('error', $error));
+			foreach($this->errors as $error) $skeleton->add(E('error', $error));
 		}
-		return $e;
+		return $skeleton;
 	}
-	
+
+	function getCaption() { return $this->caption; }
+	function getAction() { return $this->action; }
 	function getMethod() { return $this->method; }
 	function getStatus() { return $this->status; }
 	function getFields() { return $this->fields; }

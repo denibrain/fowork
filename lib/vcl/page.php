@@ -1,21 +1,33 @@
 <?php
 namespace FW\VCL;
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 class Page extends Component {
 
 	private $caption;
+	public $controller;
 
 	function __construct($name) {
 		parent::__construct($name);
 		$this->family = 'page';
-
 	}
 
-	function getCaption() { return $this->caption; }
-
 	function handleEvent($event, $data) {}
+
+	function getCaption() { return $this->caption; }
+	function getMap() { return array(); }
+	function setContent($value) { $this->content = $value; }
+
+	function init($params) {}
+
+	// @todo Need thinking
+	function run() {
+		if ($_SERVER['REQUEST_METHOD'] == 'GET')
+			$set = &$_GET;
+		else
+			$set = &$_POST;
+
+		if (isset($set['_event']) && isset($set['_sender'])) {
+			$this->perform($set['_sender'], $set['_event'], $set);
+		}
+	}
 }

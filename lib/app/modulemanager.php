@@ -36,7 +36,9 @@ class ModuleManager extends \FW\Object {
 				$modulfile = $path.$filename.'.php';
 				if (file_exists($modulfile)) {
 					require_once $modulfile;
-					return $this->cache[$key] = new $classname($this->app);
+					$cls = new $classname($this->app);
+					$classname::$_ = $cls;
+					return $this->cache[$key] = $cls;
 				}
 				
 			}
@@ -53,6 +55,6 @@ class ModuleManager extends \FW\Object {
 				return;
 			}
 		}
-		throw new \Exception("Module $name not found!");
+		//throw new \Exception("Module $name not found!");
 	}
 }

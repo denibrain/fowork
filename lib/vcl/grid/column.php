@@ -2,7 +2,6 @@
 namespace FW\VCL\Grid;
 
 class Column extends \FW\VCL\Component {
-	private $name;
 	private $width;
 	private $sort;
 	private $caption;
@@ -19,8 +18,8 @@ class Column extends \FW\VCL\Component {
 	const ANY = '*';
 
 	const SORTNONE = 0;
-	const SORTASC = 1;
-	const SORTDESC = 2;
+	const SORT = 1;
+	const DESC = 2;
 
 	function __construct($name, $caption = '', $width = Column::ANY, 
 			$align = Column::LEFT, $sort = Column::SORTNONE) {
@@ -38,4 +37,9 @@ class Column extends \FW\VCL\Component {
 		$skeleton->add(D($this, 'width,caption,align,sort'));
 		return $skeleton;
 	}
+
+	function getWidth() { return $this->width; }
+	function getCaption() { return $this->caption; }
+	function getAlign() { return $this->align; }
+	function getSort() { return $this->sort; }
 }
