@@ -84,7 +84,8 @@ class PgSQL extends DB {
 class PgSQLQuery extends Query {
 	function __construct(PgSQL $db, $query) {
         parent::__construct($db, $query);
-		if (false===($this->handle = @\pg_query($db->handle, $query))) {
+		$this->handle = @\pg_query($db->handle, $query);
+		if (!$this->handle) {
 			echo $query;
             throw new PgSQLException($this->db->handle);
 		}

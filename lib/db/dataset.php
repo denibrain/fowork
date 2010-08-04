@@ -63,9 +63,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 	
 	// Data Access properties
 	private $row = 0;
-	private $query = '';
 	private $opened = false;
-	private $data;
 	private $q;
 	private $count = false;
 	
@@ -89,7 +87,17 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 		self::$fieldParse = new \FW\Text\Parser(FW_LIB.'db/stx/field.php');
 		self::$queryParse = new \FW\Text\Parser(FW_LIB.'db/stx/query.php');
 	}
-	
+
+	public function  __sleep() {
+		$a = \get_object_vars ( $this );
+		unset($a['db']);
+		return array_keys($a);
+	}
+
+	public function  __wakeup() {
+		$this->db = \FW\App\App::$_->db;
+	}
+
 	public function __construct($query, $params = array(), $db = null) {
 		$this->db = !$db ? \FW\App\App::$_->db : $db;
 		
