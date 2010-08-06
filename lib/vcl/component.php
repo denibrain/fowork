@@ -8,7 +8,6 @@ class Component extends \FW\Object {
 	protected $family;
 	private $visible;
 	private $owner;
-	private $data;
 
 	/**
 	 * Contructor
@@ -24,12 +23,10 @@ class Component extends \FW\Object {
 		$this->className = strtolower(get_class($this));
 		$pos = \strrpos($this->className, '\\');
 		if ($pos !== false) $this->className = substr($this->className, $pos + 1);
-
-		$this->data = E('data');
 	}
 
 	function display() {
-		$skeleton = E($this->family, D($this, 'id,name,visible'), A('class', $this->className), E('data', $this->data));
+		$skeleton = E($this->family, D($this, 'id,name,visible'), A('class', $this->className));
 		foreach($this->controls as $item)
 			$skeleton->add($item->display());
 		
@@ -97,7 +94,6 @@ class Component extends \FW\Object {
 
 	function getId() { return (isset($this->owner) ? $this->owner->id.'.' : '' ).$this->name; }
 	function getName() {return $this->name;}
-	function getData() {return $this->data;}
 	function getVisible() {return $this->visible;}
 	function getControls() {return $this->controls;}
 	function getClassName() {return $this->className;}

@@ -37,7 +37,7 @@ class Module extends \FW\App\Module {
 		$db = \FW\App\App::$_->db;
 		$db->begin();
 		try {
-			if (isset($_SESSION['page']) && $_SESSION['page']['url'] == App::$_->request->url) {
+			if ($_SERVER['REQUEST_METHOD'] != 'GET' && isset($_SESSION['page']) && $_SESSION['page']['url'] == App::$_->request->url) {
 				$page = unserialize($_SESSION['page']['data']);
 			} else {
 				$page = new $pageClass($name);

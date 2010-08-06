@@ -137,8 +137,7 @@ class App extends \FW\Object {
 	}
 	
 	function transform($e, $name) {
-		$c =  "\\FW\\Text\\Element";
-		if (!($e instanceof $c))
+		if (!($e instanceof \FW\Text\Element))
 			throw new EApp("Invalid Element for transform");
 		return $this->xslt->transform($e->asXML(), $name);
 	}

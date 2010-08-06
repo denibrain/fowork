@@ -41,9 +41,10 @@ class XSLTransformer extends \FW\Object {
 				$xsl=new \DOMDocument();
 				$f = $this->xslPath."$value.xsl";
 				if (!file_exists($f)) {
-					throw new \Exception("{$this->xslPath}$value not found");
+					throw new \Exception("{$this->xslPath}$value.xsl not found");
 				}
 				$xsl->load($f);
+
 				$this->xslh->importStyleSheet($xsl);
 				break;
 			default:
