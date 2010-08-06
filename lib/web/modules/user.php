@@ -18,16 +18,18 @@ class User extends \FW\Web\Module {
 	
 	function __construct($app) {
 		parent::__construct($app);
+		if (isset($_COOKIE['SUID']) &&
+			$session = $this->dsSession(A('id', (int)$_COOKIE['SUID']))->getA())
+		{
+			if (!$session) throw new EInvalidSession();
 
-		if (isset($_COOKIE['SUID']) and
-			$session = $this->dsSession(A('id', (int)$_COOKIE['SUID']))->getA()) {
-			
 			$this->SUID = (int)$_COOKIE['SUID'];
 			if ($session['ip']!=$_SERVER['REMOTE_ADDR']) throw new EInvalidSession();
 			if ($session['diff'] > 3600) throw new ESessionExpired();
 			if (!$session['active']) throw new ESessionStopped();
 			
 			$this->id = $session['userid'];
+
 			$this->type = $session['type'];
 			$this->name = $session['name'];
 			$this->loadGroups();
@@ -39,6 +41,8 @@ class User extends \FW\Web\Module {
 			$this->type = 'guest';
 			$this->name = 'Гость';
 			$this->groups = array('guest');
+			if (isset($_COOKIE['SUID']))
+				setcookie('SUID', $_COOKIE['SUID'], time() - 3600);
 		}
 	}
 
@@ -102,8 +106,8 @@ class User extends \FW\Web\Module {
 			$this->stopSession();
 	}
 
-	function fogot($form) {
-		$ds = $this->dsByemail($form->getValues());
+	function fogot($email) {
+		$ds = $this->dsByemail(A('email', $email));
 		if (!$ds->count()) throw new Exception('Данный пользователь в системе не найден');
 		while ($data = $ds->getA()) {
 			$data['pass'] = (string)new FW\Util\Password();
@@ -120,20 +124,6 @@ class User extends \FW\Web\Module {
 	
 	/* Visual Section ------------------ */
 	
-	function displayLogout() {
-		$this->logout();
-		throw new ERedirect('login');
-		return E('quit');
-	}
-
-	function displayFogot() {
-		$form = $this->form('fogot');
-		if ($form->proceed() == $form::OK) 
-			return E('sended');
-		else
-			return E('fogot', $form->display());
-	}
-	
 	function displayUserInformer() {
 		if (!$this->id) return E('loginbox');
 		return E('logined', A('type', $this->type, 'name', $this->name));
@@ -149,27 +139,4 @@ class User extends \FW\Web\Module {
 	function displayInbox($params) {
 		return $this->dsInbox($params)->items(E('messages'), 'message');
 	}
-	
-	/* display personal info
-	@param id client ID
-	*/
-	function displayChangePass($params) {
-		if (!($user = $this->dsUser($params)->getA()))
-			throw new E404();
-		
-		$form = new Forms\Form('changepass');
-		$form->add(new Forms\Button("изменить", "change"));
-		
-		if ($form->proceed() == $form::OK) {
-			$user['pass'] = (string)new \FW\Util\Password();
-			$user['login'] = $user['id'];
-			$pass =  $this->passhash($user['pass']);
-			$this->dpChangepassword($user['id'], $pass);
-			$this->app->mailTo(
-				array(E('changedpass', $user), 2=>'user.ChangePass.mail'), 'Смена пароля', $user['email']);
-			
-			return E('complete');
-		}
-		else return E('welcome', $form->display());
-	}	
 }

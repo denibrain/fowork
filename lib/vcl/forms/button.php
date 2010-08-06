@@ -10,6 +10,7 @@ class Button extends \FW\VCL\Component {
 	
 	private $caption;
 	protected $type;
+	public $onClick;
 	
 	function __construct($name, $caption = '', $type = Button::SUBMIT) {
 		parent::__construct($name);

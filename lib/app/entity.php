@@ -21,14 +21,11 @@ class Entity extends \FW\Object {
 		$f = FW_PTH_ETC."{$this->classname}.cfg.php";
 		if (file_exists($f)) include $f;
 	}
-	
-	public function __get($key) {
-		switch($key) {
-			case 'app': return $this->app;
-			case 'classname': return $this->classname;
-			default: return parent::__get($key);
-		}
-	}
+
+	function getConfig() { return $this->config; }
+	function getClassname() { return $this->classname; }
+	function getApp() { return $this->app; }
+
 	function __call($name, $args) {
 		$pr = substr($name, 0, 2);
 		$funcName = strtolower(substr($name, 2));

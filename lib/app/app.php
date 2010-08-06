@@ -93,7 +93,21 @@ class App extends \FW\Object {
 			
 		);
 	}
-	
+
+	function puresafe($method/* param */)  {
+		$params = array_slice(func_get_args(), 1);
+
+		$this->db->begin();
+		try {
+			$result = call_user_func_array($method, $params);
+			$this->db->commit();
+		} catch (\Exception $e) {
+			$this->db->rollback();
+			throw $e;
+		}
+		return $result;
+	}
+
 	public function log($str) {
 		$this->systemLog->write($str);
 	}

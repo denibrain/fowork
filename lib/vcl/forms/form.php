@@ -19,7 +19,6 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	
 	private $fields;
 	private $buttons;
-	private $items = array();
 	
 	public $onCreate = null;
 	public $onFirstShow = null;
@@ -56,6 +55,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	}
 		
 	function proceed($auxData = false) {
+		$this->errors = array();
 		if (false!==$auxData || (isset($_POST['_form']) && $this->name == $_POST['_form'])) {
 			if (false===$auxData) {
 				$auxData =  $this->method == 'POST' ?
@@ -69,7 +69,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 			foreach($this->buttons as $name => $button) if (isset($auxData[$name])) {
 				$this->pressedButton = $button;
 			}
-			if (!$this->pressedButton) {
+			if (false === $this->pressedButton) {
 				$this->errors[] = array('code'=> "FF.invalidbutton", 'field'=>".common",
 					'text'=>S_FORM_INVALIDBUTTON);
 				$this->status = Form::ERROR;
@@ -83,8 +83,11 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 				}
 				if ($this->pressedButton->type == 'submit')
 					$this->status =  $this->responce = $this->check($auxData) ? Form::OK : Form::ERROR;
-				else
+				else {
 					$this->status = Form::OK;
+					if (isset($this->pressedButton->onClick))
+					 \call_user_func ($this->pressedButton->onClick, $this);
+				}
 			}
 		} else {
 			$this->status = Form::NONE;
@@ -121,7 +124,6 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 	}
 
 	function check($data) {
-		$this->errors = array();
 		foreach($this->fields as $key => $fld) {
 			$fld->value = isset($data[$key]) ? $data[$key] : '';
 			try {

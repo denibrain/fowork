@@ -12,7 +12,7 @@ class Controls extends \FW\Object implements \IteratorAggregate, \ArrayAccess {
 
 	function __get($key) {
 		if (isset($this->items[$key])) return $this->items[$key];
-		else return parent::__get($key);
+		else return null;
 	}
 	
 	function add($item) {

@@ -23,28 +23,6 @@ class Module extends \FW\App\Module {
 		return $form;
 	}
 	
-	function safe($method/* param */)  {
-		try {
-			return call_user_func_array(array($this, 'puresafe'), func_get_args());	
-		} catch (Exception $e) {
-			return E('error', A('msg', $e->getMessage()));
-		}
-	}
-	
-	function puresafe($method/* param */)  {
-		$params = array_slice(func_get_args(), 1);
-		
-		App::$_->db->begin();
-		try {
-			$result = call_user_func_array(array($this, $method), $params);
-			App::$_->db->commit();
-		} catch (\Exception $e) {
-			App::$_->db->rollback();
-			throw $e;
-		}
-		return $result;
-	}
-
 	function __call($name, $args) {
 		if (substr($name, 0, 7) === 'display') {
 			$pageName = substr($name, 7);
@@ -56,22 +34,35 @@ class Module extends \FW\App\Module {
 	}
 
 	function defaultDisplay($pageClass, $name, $params) {
-		if (isset($_SESSION['page']) && $_SESSION['page']['url'] == App::$_->request->url) {
-			$page = unserialize($_SESSION['page']['data']);
-		} else {
-			$page = new $pageClass($name);
-			$page->init($params);
+		$db = \FW\App\App::$_->db;
+		$db->begin();
+		try {
+			if (isset($_SESSION['page']) && $_SESSION['page']['url'] == App::$_->request->url) {
+				$page = unserialize($_SESSION['page']['data']);
+			} else {
+				$page = new $pageClass($name);
+				$page->init($params);
+			}
+
+			$page->run();
+
+			$_SESSION['page'] = array(
+				'url' => App::$_->request->url,
+				'data' => serialize($page)
+			);
+
+			$result = $page->display();
+			
+			$db->commit();
+		} catch (\ERedirect $e) {
+			$db->commit();
+			throw $e;
 		}
-
-		$page->run();
-		
-		$_SESSION['page'] = array(
-			'url' => App::$_->request->url,
-			'data' => serialize($page)
-		);
-
-		return $page->display();
+		catch (\Exception $e) {
+			$db->rollback();
+			$result = E('error', A('msg', $e->getMessage()));
+		}
+	
+		return $result;
 	}
 }
-
-?>

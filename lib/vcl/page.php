@@ -4,7 +4,6 @@ namespace FW\VCL;
 class Page extends Component {
 
 	private $caption;
-	public $controller;
 
 	function __construct($name) {
 		parent::__construct($name);

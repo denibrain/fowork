@@ -8,6 +8,7 @@ class Component extends \FW\Object {
 	protected $family;
 	private $visible;
 	private $owner;
+	private $data;
 
 	/**
 	 * Contructor
@@ -23,10 +24,12 @@ class Component extends \FW\Object {
 		$this->className = strtolower(get_class($this));
 		$pos = \strrpos($this->className, '\\');
 		if ($pos !== false) $this->className = substr($this->className, $pos + 1);
+
+		$this->data = E('data');
 	}
 
 	function display() {
-		$skeleton = E($this->family, D($this, 'id,name,visible'), A('class', $this->className));
+		$skeleton = E($this->family, D($this, 'id,name,visible'), A('class', $this->className), E('data', $this->data));
 		foreach($this->controls as $item)
 			$skeleton->add($item->display());
 		
@@ -59,8 +62,10 @@ class Component extends \FW\Object {
 
 	function remove($control) {
 		if (\is_string($control)) $control = $this->controls->$control;
-		$control->owner = null;
-		$this->controls->remove($control);
+		if ($control) {
+			$this->controls->remove($control);
+			$control->owner = null;
+		}
 		return $control;
 	}
 
@@ -92,9 +97,10 @@ class Component extends \FW\Object {
 
 	function getId() { return (isset($this->owner) ? $this->owner->id.'.' : '' ).$this->name; }
 	function getName() {return $this->name;}
+	function getData() {return $this->data;}
 	function getVisible() {return $this->visible;}
 	function getControls() {return $this->controls;}
 	function getClassName() {return $this->className;}
 	function getOwner() {return $this->owner;}
-	function setOwner($value) {$this->owner = $value;}
+	function setOwner($value) {	$this->owner = $value; }
 }
