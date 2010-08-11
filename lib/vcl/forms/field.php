@@ -33,7 +33,7 @@ class Field extends \FW\VCL\Component {
 			try {
 				$this->validator->validate($newValue);
 			} catch (\FW\Validate\EValidate $e) {
-				throw new EFormData($e->code, $this->name);
+				throw new EFormData($e->code, $this->name, $e->getMessage());
 			}
 	}
 

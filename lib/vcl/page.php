@@ -17,6 +17,8 @@ class Page extends Component {
 	function setContent($value) { $this->content = $value; }
 
 	function init($params) {}
+	function caption($params) { return 'Untitled'; }
+	function map($params) { return array(); }
 
 	// @todo Need thinking
 	function run() {

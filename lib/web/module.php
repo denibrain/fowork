@@ -3,32 +3,18 @@ namespace FW\Web;
 
 class Module extends \FW\App\Module {
 	
-	function form($name = '') {
-		$name = $this->classname.($name ? ".".strtolower($name) : '');
-		if (!file_exists($f = FW_PTH_APP."forms/$name.php"))
-			throw new \Exception("Not found form $name ($f)");
-			
-		$form = new \FW\VCL\Forms\Form($name, $f, $this);
-		if ($form->autoProceed) $form->proceed();
-		return $form;
-	}
-	
-	function grid($datasource = NULL, $name = '') {
-		$name = $this->classname. ($name ? ".".strtolower($name) : '');
-		if (!file_exists($f = FW_PTH_APP."grids/$name.php"))
-			throw new \Exception("Not found grid $name ($f)");
-			
-		$form = new \FW\VCL\Grid\Grid($name, $f, $this);
-		if ($datasource) $form->dataSource = $datasource;
-		return $form;
-	}
-	
 	function __call($name, $args) {
 		if (substr($name, 0, 7) === 'display') {
 			$pageName = substr($name, 7);
 			if (!$pageName) $pageName = $this->classname;
 			$pageClass = "\\Page\\$this->classname\\$pageName";
 			return $this->defaultDisplay($pageClass, $pageName, $args[0]);
+		}
+		if (substr($name, 0, 7) === 'caption') {
+			$pageName = substr($name, 7);
+			if (!$pageName) $pageName = $this->classname;
+			$pageClass = "\\Page\\$this->classname\\$pageName";
+			return $this->defaultCaption($pageClass, $pageName, $args[0]);
 		}
 		else return parent::__call ($name, $args);
 	}
@@ -54,7 +40,7 @@ class Module extends \FW\App\Module {
 			$result = $page->display();
 			
 			$db->commit();
-		} catch (\ERedirect $e) {
+		} catch (\ERequest $e) {
 			$db->commit();
 			throw $e;
 		}
@@ -64,5 +50,15 @@ class Module extends \FW\App\Module {
 		}
 	
 		return $result;
+	}
+	
+	function defaultCaption($pageClass, $name, $params) {
+		$page = new $pageClass($name);
+		return $page->caption($params);
+	}
+
+	function defaultMap($pageClass, $name, $params) {
+		$page = new $pageClass($name);
+		return $page->map($params);
 	}
 }

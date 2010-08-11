@@ -8,6 +8,7 @@ class Enum extends Validator {
 	const NEWLINE = '/\r?\n/';
 
 	private $itemValidator;
+	private $separator;
 	public  $maxCount = 0;
 	public  $minCount = 0;
 
