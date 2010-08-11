@@ -399,13 +399,15 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$v = strtoupper($v);
 			case 'str1':
 			case 'str2':
-				$self = $this;
+				$params = $this->params;
+				$cond = &$this->cond;
 				$v = preg_replace_callback('/:{([a-z0-9]+)}/i',
-					function($matches) use ($self){
+					function($matches) use ($params, &$cond){
 						$v = $matches[1];
 						if (isset($self->params[$v])) return $self->params[$v];
-						if($self->cond === false) throw new \Exception("Param $v is absent");
-						else ++$self->cond;						
+						
+						if($cond === false) throw new \Exception("Param $v is absent");
+						else ++$cond;						
 					}, $v);
 			case 'num':
 				$this->expr .= $v;
