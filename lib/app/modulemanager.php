@@ -48,7 +48,7 @@ class ModuleManager extends \FW\Object {
 
 	function load($name) {
 		foreach($this->path as $path) {
-			$modulfile = $path.$name.'.php';
+			$modulfile = strtolower($path.$name.'.php');
 			if (file_exists($modulfile)) {
 				require_once $modulfile;
 				return;
