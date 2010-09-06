@@ -24,7 +24,6 @@ class Context extends \FW\Object {
 			throw new ESocketServer(socket_strerror($eCode), $eCode);
 		}
 		
-		echo "{DBG} read\n$buf\n";
 		return $buf;
 	}
 	
@@ -33,7 +32,6 @@ class Context extends \FW\Object {
 	* @param String $buf
 	*/
 	public function write($buf) {
-		echo "{DBG} write\n$buf\n";
 		if(@socket_write($this->socket, $buf) === false){
 			$eCode = socket_last_error();
 			throw new ESocketServer(socket_strerror($eCode), $eCode);
