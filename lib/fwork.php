@@ -20,4 +20,4 @@ spl_autoload_register(function ($name) {
 });
 
 require FW_LIB."shortcuts.php";
-?>
+require FW_LIB."config.php";

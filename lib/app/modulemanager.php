@@ -1,12 +1,16 @@
 <?php
 namespace FW\App;
 
-class ModuleManager extends \FW\Object {
+class ModuleManager extends \FW\Object implements \IteratorAggregate {
 	
 	private $path = array();
 	private $cache;
 	private $app;
-	
+
+	function getIterator() {
+		return new \ArrayIterator($this->cache);
+	}
+
 	function __construct($app, $path = '') {
 		$this->app = $app;
 		$this->cache = array();

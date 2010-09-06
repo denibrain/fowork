@@ -11,6 +11,7 @@ class Server extends \FW\Object {
 	private $stopState = false;
 	
 	public $onNewConnection;
+	public $onIdle;
 	
 	public function __construct() {
 		$this->connected = false;
@@ -130,6 +131,9 @@ class Server extends \FW\Object {
 			}
 			
 			$this->proceedConnections();
+			if (isset($this->onIdle)) {
+				\call_user_func($this->onIdle);
+			}
 			usleep(100);
 		}
 	}
