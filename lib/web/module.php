@@ -2,6 +2,8 @@
 namespace FW\Web;
 
 class Module extends \FW\App\Module {
+
+	protected $item = false;
 	
 	function __call($name, $args) {
 		if (substr($name, 0, 7) === 'display') {
@@ -17,6 +19,13 @@ class Module extends \FW\App\Module {
 			return $this->defaultCaption($pageClass, $pageName, $args[0]);
 		}
 		else return parent::__call ($name, $args);
+	}
+
+	function getItem($params) {
+		if (!$this->item || $this->item['id'] == $params['id']) {
+			if (!($this->item = $this->dsItem($params)->getA())) throw new E404();;
+		}
+		return $this->item;
 	}
 
 	function defaultDisplay($pageClass, $name, $params) {
@@ -47,6 +56,7 @@ class Module extends \FW\App\Module {
 		catch (\Exception $e) {
 			$db->rollback();
 			$result = E('error', A('msg', $e->getMessage()));
+			throw $e;
 		}
 	
 		return $result;

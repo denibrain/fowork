@@ -16,6 +16,11 @@ namespace FW\Web {
 		function __construct($root = false) {
 			parent::__construct($root);
 			$this->mm->addPath(dirname(__FILE__).'/modules/');
+
+			if (defined('FW_PTH_TEMP'))
+				ini_set('session.save_path', FW_PTH_TEMP);
+			session_start();  // TODO remove and use session module
+
 		}
 		
 		/* проверка прав текущего пользвоателя

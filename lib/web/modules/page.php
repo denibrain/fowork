@@ -159,7 +159,10 @@ class Page extends FW\App\Module {
 				list($valueurl, $params) = $urls[$id];
 				$this->path[$valueurl] = $this->app->resolve($expression == '*' ? "{"."$page}" : $expression, $params);
 			}
+		} else {
+			$this->parentIds = array();
 		}
+
 			
 		$this->path[(string)$this->url] = $this->caption;
 		$this->path2[$this->id] = array((string)$this->url, $this->params);

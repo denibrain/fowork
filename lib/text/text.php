@@ -58,7 +58,7 @@ class Text extends \FW\Object {
 			);
 			return substr(iconv_mime_encode('', $this->text, $preferences), 2);
 		} else {
-			return mb_encode_mimeheader($this->text, 'utf-8', 'Q', PHP_EOL);
+			return \mb_encode_mimeheader($this->text, 'utf-8', 'Q', PHP_EOL);
 		}
 	}
 

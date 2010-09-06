@@ -47,10 +47,6 @@ class App extends \FW\Object {
 		date_default_timezone_set(FW_TIMEZONE);
 		set_exception_handler(array($this, "exceptionHandler"));
 
-		if (defined('FW_PTH_TEMP'))
-			ini_set('session.save_path', FW_PTH_TEMP);
-		session_start();  // TODO remove and use session module
-		
 		// load locale
 		if (file_exists(FW_PTH_LOCALE))
 		foreach(new \DirectoryIterator(FW_PTH_LOCALE) as $entry)
@@ -126,7 +122,7 @@ class App extends \FW\Object {
 				if (isset($text[1]) && $text[1]!='') $letter->html = $this->transform($text[0], $text[1]);
 				if (isset($text[2]) && $text[2]!='') $letter->text = $this->transform($text[0], $text[2]);
 			}
-		} else $mail->text = $text;
+		} else $letter->text = $text;
 
 		$letter->to = $to?$to:FW_MAILSITE;
 		$letter->subject =$topic;

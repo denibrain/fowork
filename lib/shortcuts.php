@@ -1,5 +1,5 @@
 <?php
-function E() {
+function E(/* ... */) {
 	$e = new \FW\Text\Element();
 	$e->addItems(func_get_args());
 	return $e;
@@ -9,7 +9,7 @@ function T($text) {
 	return new \FW\Text\Text($text);
 }
 
-function A() {
+function A(/* ... */) {
 	$result = array();
 	$args = func_get_args();
 	while (list(,$e) = each($args)) list(, $result[$e]) = each($args);
@@ -25,6 +25,20 @@ function D($object, $fields) {
 	} else
 		foreach($fields as $key) $a[$key] = $object[$key];
 	return $a;
+}
+
+/**
+ * Dataset
+ */
+function Q($query, $params = array()) {
+	return new FW\DB\DataSet($query, $params);
+}
+
+/**
+ * Exexute DB query
+ */
+function X(/* ... */) {
+	return FW\App\App::$_->db->execute(call_user_func_array(array(FW\App\App::$_->db, 'format'), func_get_args()));
 }
 
 function he($a) { return T($a)->html; }
