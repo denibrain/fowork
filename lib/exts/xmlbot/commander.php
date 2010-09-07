@@ -46,11 +46,11 @@ class Commander extends \FW\Object {
 				array('module'=>$target, 'name'=>$action, 'id'=>(string)1), $params));
 		$response = $this->doRequest($request);
 		if ($response->type != 'OK') {
-			throw new \Exception('Syntax execute of commnand fail: '.$response->description, $response->code);
+			throw new ECommand('Syntax request fail: '.$response->description, $response->code);
 		}
 		$command = $response->body->command[0];
 		if ($command->status != 'ok') {
-			throw new \Exception('Syntax execute of commnand fail: '.$command->description, $command->code);
+			throw new ECommand('Syntax execute of commnand fail: '.$command->description, $command->code);
 		}
 		switch ($command->result[0]->type) {
 			case 'void': return;
@@ -77,3 +77,5 @@ class Commander extends \FW\Object {
 		return $r;
 	}
 }
+
+class ECommand extends \Exception {}

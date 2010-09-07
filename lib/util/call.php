@@ -69,15 +69,22 @@ class Call {
 	}
 
 	function read() {
+		if (feof($this->pipes[Call::OUT_PIPE])) return false;
 		return stream_get_contents($this->pipes[Call::OUT_PIPE]);
 	}
 
 	function error() {
+		if (feof($this->pipes[Call::ERROR_PIPE])) return false;
 		return stream_get_contents($this->pipes[Call::ERROR_PIPE]);
 	}
 
 	function write($data) {
 		fwrite($this->pipes[Call::IN_PIPE], $data);
+		fflush($this->pipes[Call::IN_PIPE]);
+	}
+
+	function terminate($code = 15) {
+		proc_terminate ($this->handle);
 	}
 
 	static function exec($command) {
