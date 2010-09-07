@@ -34,7 +34,6 @@ class Call {
 
 		$this->handle = proc_open($command ? $command : $this->command,
 			$this->pipespec, $this->pipes, $this->cwd, $this->env, $proc_options);
-		var_dump($this->handle);
 
 		if (!is_resource($this->handle))
 			throw new \Exception("Cannot call $command\n");
