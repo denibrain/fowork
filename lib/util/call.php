@@ -88,7 +88,7 @@ class Call {
 		$call->open();
 		$call->waitforstop();
 		$data = $call->read();
-		\FW\App\App::$_->log($this->error());
+		\FW\App\App::$_->log($call->error());
 		return array($call->close(), $data);
 	}
 }
