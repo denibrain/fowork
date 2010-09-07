@@ -21,10 +21,6 @@ class Log extends \FW\Object {
 
 	function getName() {return $this->name;}
 
-	function __destruct() {
-		if ($this->handle) fclose($this->handle);
-	}
-	
 	function write($str) {
 		file_put_contents('php://stderr', $str.PHP_EOL);
 	}

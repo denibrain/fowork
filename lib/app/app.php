@@ -53,7 +53,16 @@ class App extends \FW\Object {
 			if (preg_match('/^'.FW_LANGUAGE.'(\.[a-z]+)?\.php$/', $entry))
 				require FW_PTH_LOCALE."$entry";
 
-		$this->systemLog = new \FW\Log\Log('system');
+		if (defined('FW_PTH_LOG'))
+			$this->systemLog = new \FW\Log\File('system');
+		elseif (defined('FW_TBL_LOG'))
+			$this->systemLog = new \FW\Log\Db('system');
+		elseif (defined('FW_MAIL_LOG'))
+			$this->systemLog = new \FW\Log\Mail('system');
+		else
+			$this->systemLog = new \FW\Log\Log('system');
+		//	$a = new \FW\Log\File('system');
+
 		$this->mm = new ModuleManager($this);
 		$this->xslt = new \FW\Text\XSLTransformer(FW_PTH_DESIGN."xsl/");
 		$this->txparser = new \FW\Text\Parser(FW_LIB.'/app/stx/caption.php');

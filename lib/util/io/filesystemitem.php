@@ -4,10 +4,6 @@ namespace FW\Util\IO;
 
 class FileSystemItem extends \FW\Object {
 	
-	const WRITE = 1;
-	const READ = 2;
-	const APEND = 3;
-	
 	private $name;
 	private $basename = false;
 

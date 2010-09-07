@@ -4,9 +4,9 @@ namespace FW\Log;
 class File extends Log {
 	
 	function __construct($name, $path = false) {
-		parent::__cinstruct($name);
+		parent::__construct($name);
 		if (!$path) $path = FW_PTH_LOG;
-		$this->handle = new File("$name.log", $path);
+		$this->handle = new \FW\Util\IO\File("$name.log", \FW\Util\IO\File::APPEND, $path);
 	}
 	
 	function write($str) {
