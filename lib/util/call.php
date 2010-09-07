@@ -49,23 +49,19 @@ class Call {
 	}
 
 	function waitforstop() {
-		echo 'wait to stop';
 		while (1) {
 			$status = \proc_get_status($this->handle);
 			if ($status['running']) usleep(100);
 			else break;
 		}
-		echo ".\n";
 	}
 
 	function waitforstart() {
-		echo 'wait to start';
 		while (1) {
 			$status = \proc_get_status($this->handle);
 			if (!$status['running']) usleep(100);
 			else break;
 		}
-		echo ".\n";
 	}
 
 	function read() {
@@ -92,6 +88,7 @@ class Call {
 		$call->open();
 		$call->waitforstop();
 		$data = $call->read();
+		\FW\App\App::$_->log($this->error());
 		return array($call->close(), $data);
 	}
 }
