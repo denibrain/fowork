@@ -12,8 +12,7 @@ class Client extends \FW\Object {
 	function getPort() { return $this->port; }
 	function setPort($value) { $this->port = $value; }
 	
-	function __construct() {
-	}
+	function __construct() {}
 	
 	/**
 	 * @throws ESocketClient
@@ -24,7 +23,7 @@ class Client extends \FW\Object {
 			throw new ESocketClient();
 		
 		if (socket_connect($this->socket, $this->host, $this->port) === false)
-			throw new ESocketClient();
+			throw new ESocketClient($this->socket);
 		$this->connected = true;
 	}
 	
@@ -34,10 +33,11 @@ class Client extends \FW\Object {
 	 **/
 
 	public function read() {
-		$buf = socket_read($this->socket, 0xffff);
-
-		echo "[DBG] read:\n$buf";
-		if ($buf === false) throw new ESocketClient();
+		$buf = @socket_read($this->socket, 0xffff);
+		\FW\App\App::$_->log("[DBG] read:\n$buf");
+		if ($buf === false) {
+			throw new ESocketClient($this->socket);
+		}
 		return $buf;
 	}
 
@@ -45,9 +45,9 @@ class Client extends \FW\Object {
 	 * @throws ESocketClient
 	 **/
 	public function write($buf)	{
-		echo "[DBG] write:\n$buf";
+		\FW\App\App::$_->log("[DBG] write:\n$buf");
 		if (@socket_write($this->socket, $buf) === false)
-			throw new ESocketClient();
+			throw new ESocketClient($this->socket);
 	}
 	
 	public function disconnect() {
@@ -66,8 +66,6 @@ class Client extends \FW\Object {
 class ESocketClient extends \Exception {
 	function __construct($socket = false) {
 		$eCode = $socket ? socket_last_error($socket) : socket_last_error();
-		// @todo clear error...
-		file_put_contents('zaz.txt', socket_strerror($eCode));
 		parent::__construct(socket_strerror($eCode), $eCode);
 	}
 }
