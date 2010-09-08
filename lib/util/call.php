@@ -100,7 +100,7 @@ class Call extends \FW\Object {
 		return array($call->close(), $data);
 	}
 
-	function run($command) {
+	function run() {
 		$this->open();
 		$this->output = $call->read();
 		$this->error = $call->error();
