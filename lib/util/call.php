@@ -104,7 +104,7 @@ class Call extends \FW\Object {
 		$this->open();
 		$this->output = $this->read();
 		$this->error = $this->error();
-		$code = (int)$call->close();
+		$code = (int)$this->close();
 		if ($code == -1 || $code == 255) $code = 0; // It's a hack! @todo remove
 		return $code;
 	}
