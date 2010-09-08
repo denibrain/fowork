@@ -37,7 +37,12 @@ class Call {
 
 		if (!is_resource($this->handle))
 			throw new \Exception("Cannot call $command\n");
-		$this->waitforstart();
+
+		//stream_set_blocking($this->pipes[Call::IN_PIPE], 0);
+		//stream_set_blocking($this->pipes[Call::OUT_PIPE], 0);
+		//stream_set_blocking($this->pipes[Call::ERROR_PIPE], 0);
+		//stream_select 
+		//$this->waitforstart();
 	}
 
 	function close() {
