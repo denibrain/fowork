@@ -1,13 +1,15 @@
 <?php
 namespace FW\Util;
 
-class Call {
+class Call extends \FW\Object {
 
 	const IN_PIPE = 0;
 	const OUT_PIPE = 1;
 	const ERROR_PIPE = 2;
 
 	private $handle;
+	private $output;
+	private $error;
 
 	private $pipespec = array(
 		Call::IN_PIPE => array("pipe", "r"),  // stdin is a pipe that the child will read from
@@ -44,6 +46,9 @@ class Call {
 		//stream_select 
 		//$this->waitforstart();
 	}
+
+	function getError() { return $this->error; }
+	function getOutput() { return $this->output; }
 
 	function close() {
 		fclose($this->pipes[Call::IN_PIPE]);
@@ -93,5 +98,14 @@ class Call {
 		$data = $call->read();
 		\FW\App\App::$_->log($call->error());
 		return array($call->close(), $data);
+	}
+
+	function run($command) {
+		$this->open();
+		$this->output = $call->read();
+		$this->error = $call->error();
+		$code = (int)$call->close();
+		if ($code == -1 || $code == 255) $code = 0; // It's a hack! @todo remove
+		return $code;
 	}
 }
