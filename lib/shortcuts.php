@@ -45,4 +45,8 @@ function he($a) { return T($a)->html; }
 function remle($a) { return T($a)->remEOL(); }
 function fixle($a) { return T($a)->setEOL(); }
 
+function F($name) {
+	return new FW\IO\File($name);
+}
+
 ?>

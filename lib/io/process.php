@@ -1,7 +1,7 @@
 <?php
-namespace FW\Util;
+namespace FW\IO;
 
-class Call extends \FW\Object {
+class Process extends \FW\Object {
 
 	const IN_PIPE = 0;
 	const OUT_PIPE = 1;
@@ -12,9 +12,9 @@ class Call extends \FW\Object {
 	private $error;
 
 	private $pipespec = array(
-		Call::IN_PIPE => array("pipe", "r"),  // stdin is a pipe that the child will read from
-		Call::OUT_PIPE => array("pipe", "w"),  // stdout is a pipe that the child will write to
-		Call::ERROR_PIPE => array("pipe", "w") // stderr is a file to write to
+		Process::IN_PIPE => array("pipe", "r"),  // stdin is a pipe that the child will read from
+		Process::OUT_PIPE => array("pipe", "w"),  // stdout is a pipe that the child will write to
+		Process::ERROR_PIPE => array("pipe", "w") // stderr is a file to write to
 		//			2 => array("file", "./error-output.txt", "a") // stderr is a file to write to
 
 	);
@@ -40,9 +40,9 @@ class Call extends \FW\Object {
 		if (!is_resource($this->handle))
 			throw new \Exception("Cannot call $command\n");
 
-		//stream_set_blocking($this->pipes[Call::IN_PIPE], 0);
-		//stream_set_blocking($this->pipes[Call::OUT_PIPE], 0);
-		//stream_set_blocking($this->pipes[Call::ERROR_PIPE], 0);
+		//stream_set_blocking($this->pipes[Process::IN_PIPE], 0);
+		//stream_set_blocking($this->pipes[Process::OUT_PIPE], 0);
+		//stream_set_blocking($this->pipes[Process::ERROR_PIPE], 0);
 		//stream_select 
 		//$this->waitforstart();
 	}
@@ -51,9 +51,9 @@ class Call extends \FW\Object {
 	function getOutput() { return $this->output; }
 
 	function close() {
-		fclose($this->pipes[Call::IN_PIPE]);
-		fclose($this->pipes[Call::OUT_PIPE]);
-		fclose($this->pipes[Call::ERROR_PIPE]);
+		fclose($this->pipes[Process::IN_PIPE]);
+		fclose($this->pipes[Process::OUT_PIPE]);
+		fclose($this->pipes[Process::ERROR_PIPE]);
 		return proc_close($this->handle);
 	}
 
@@ -74,34 +74,26 @@ class Call extends \FW\Object {
 	}
 
 	function read() {
-		if (feof($this->pipes[Call::OUT_PIPE])) return false;
-		return stream_get_contents($this->pipes[Call::OUT_PIPE]);
+		if (feof($this->pipes[Process::OUT_PIPE])) return false;
+		return stream_get_contents($this->pipes[Process::OUT_PIPE]);
 	}
 
 	function error() {
-		if (feof($this->pipes[Call::ERROR_PIPE])) return false;
-		return stream_get_contents($this->pipes[Call::ERROR_PIPE]);
+		if (feof($this->pipes[Process::ERROR_PIPE])) return false;
+		return stream_get_contents($this->pipes[Process::ERROR_PIPE]);
 	}
 
 	function write($data) {
-		fwrite($this->pipes[Call::IN_PIPE], $data);
-		fflush($this->pipes[Call::IN_PIPE]);
+		fwrite($this->pipes[Process::IN_PIPE], $data);
+		fflush($this->pipes[Process::IN_PIPE]);
 	}
 
 	function terminate($code = 15) {
 		proc_terminate ($this->handle);
 	}
 
-	static function exec($command) {
-		$call = new Call($command);
-		$call->open();
-		$data = $call->read();
-		\FW\App\App::$_->log($call->error());
-		return array($call->close(), $data);
-	}
-
-	function run() {
-		$this->open();
+	function run($command = '') {
+		$this->open($command);
 		$this->output = $this->read();
 		$this->error = $this->error();
 		$code = (int)$this->close();

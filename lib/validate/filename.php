@@ -20,11 +20,11 @@ class Filename extends Mask {
 		if ($type & 1)
 			$mask = '(?:'.Filename::DRIVE.')?[/\\\\]';
 
-		$mask .= '(?:'.Filename::NAME.'[/\\\\])+';
+		$mask .= '(?:'.Filename::NAME.'[/\\\\])*';
 
 		if ($type & 2)
 			$mask .= FileName::NAME;
-		
+
 		parent::__construct('`^'.$mask.'$`');
 	}
 }

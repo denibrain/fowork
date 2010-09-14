@@ -1,6 +1,6 @@
 <?php
 
-namespace FW\Util\IO;
+namespace FW\IO;
 
 class FileSystemItem extends \FW\Object {
 	

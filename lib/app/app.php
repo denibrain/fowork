@@ -91,6 +91,9 @@ class App extends \FW\Object {
 	}
 
 	public function exceptionHandler($e) {
+		if (!$this->systemLog)
+			die("SYSLOG:FAIL WRITE ".$e->getMessage());
+
 		$this->systemLog->write(
 			sprintf("[%d] %s\nFile: %s:%d\nStack trace:\n",
 				$e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine() 

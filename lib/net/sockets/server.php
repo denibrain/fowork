@@ -126,11 +126,12 @@ class Server extends \FW\Object {
 			if(!$this->stopState) {
 				$this->checkNewConnections();
 			}
-			elseif(!count($this->connections)) {
-				exit();
+
+
+			if(count($this->connections)) {
+				$this->proceedConnections();
 			}
 			
-			$this->proceedConnections();
 			if (isset($this->onIdle)) {
 				\call_user_func($this->onIdle);
 			}
