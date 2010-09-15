@@ -85,7 +85,7 @@ class File extends FileSystemItem {
 	function linkTo($targetName) {
 		if (!file_exists($targetName))
 		throw new \Exception("$targetkName not found");
-		if (!\symlink($linkName, $this->name))
+		if (!\symlink($targetName, $this->name))
 		throw new \Exception("Cannot create link $this->name for $targetName file");
 	}
 
