@@ -1,6 +1,6 @@
 <?php
 
-namespace fw\io;
+namespace FW\IO;
 
 class Dirpool extends \fw\Object {
 
