@@ -18,7 +18,14 @@ class Dir extends FileSystemItem implements \Iterator {
 			mkdir($this->name, $mode, true);
 		if ($user) chown($this->name, $user);
 	}
-	
+
+	function createChild($name) {
+		$d = new Dir($this->name.'/'.$name);
+		$d->create();
+		return $d;
+	}
+
+
 	function delete() {
 		if (!$this->exists) throw new \Exception("Directory $this->name not exists!");
 		foreach($this as $item) 
@@ -37,7 +44,7 @@ class Dir extends FileSystemItem implements \Iterator {
 	public function key() { return $this->no; }
 	public function valid() { 
 	    do {
-		$this->data = $this->dir->read();
+			$this->data = $this->dir->read();
 	    } while ($this->data && ($this->data == '.' || $this->data == '..'));
 	    return false !== ($this->data);
 	}
@@ -56,5 +63,20 @@ class Dir extends FileSystemItem implements \Iterator {
 	public function current() { 
 		$name = "$this->name/$this->data";
 		return is_dir($name) ? new Dir($name) : new File($name);
+	}
+
+	function copyTo($target) {
+		$d = new Dir($target);
+		if (!$d->exists) $d->create();
+		$stack = array(array($this, $d));
+		while ($stack) {
+			list($dir, $target) = array_pop($stack);
+			foreach ($dir as $item) {
+				if ($item instanceof Dir)
+					\array_push ($stack, array($item, $target->createChild($item->basename)));
+				else
+					$item->copyTo($target->name."/".$item->basename);
+			}
+		}
 	}
 }

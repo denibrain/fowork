@@ -8,10 +8,6 @@ class FileSystemItem extends \FW\Object {
 	private $basename = false;
 
 	function __construct($name) {
-		$dir = dirname($name);
-		if(!is_dir($dir)){
-			mkdir($dir, 0644, true);
-		}
 		$this->name = $name;
 	}
 

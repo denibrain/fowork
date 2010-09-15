@@ -103,6 +103,12 @@ class File extends FileSystemItem {
 	static function init() {
 		self::$pathValidator = new \FW\Validate\Filename(\FW\Validate\Filename::FULLPATH);
 	}
+
+	function copyTo($name) {
+		$f = F($name);
+		if ($f->exists) $f->delete();
+		copy($this->name, $name);
+	}
 }
 
 File::init();
