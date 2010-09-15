@@ -74,19 +74,19 @@ class File extends FileSystemItem {
 
 	function delete() {
 		if (!\unlink($this->name))
-		throw new Exception("Cannot delete $this->name file");
+		throw new \Exception("Cannot delete $this->name file");
 	}
 
 	function createLink($linkName) {
 		if (!\symlink($this->name, $linkName))
-		throw new Exception("Cannot create link $linkName fo $this->name file");
+		throw new \Exception("Cannot create link $linkName fo $this->name file");
 	}
 
 	function linkTo($targetName) {
 		if (!file_exists($targetName))
-		throw new Exception("$targetkName not found");
+		throw new \Exception("$targetkName not found");
 		if (!\symlink($linkName, $this->name))
-		throw new Exception("Cannot create link $this->name for $targetName file");
+		throw new \Exception("Cannot create link $this->name for $targetName file");
 	}
 
 	function lock($mode) {
