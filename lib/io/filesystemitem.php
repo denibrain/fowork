@@ -19,21 +19,16 @@ class FileSystemItem extends \FW\Object {
 		return $this->name;
 	}
 
-	function __get($key) {
-		switch($key) {
-			case 'name' : return $this->name;
-			case 'basename' : return false === $this->basename ? $this->basename = \basename($this->name) : $this->basename;
-			case 'exists' : return file_exists($this->name);
-			default: return parent::__get($key);
-		}
+	function getName() {return $this->name;}
+	function getExists() { return file_exists($this->name);}
+	function getBasename() {
+		return false === $this->basename ?
+			$this->basename = \basename($this->name) :
+			$this->basename;
 	}
 	
-	function __set($key, $value) {
-		switch($key) {
-			case 'name' : return rename($this->name, $value);
-			default:
-				parent::__set($key, $value);
-		}
+	function setName($value) {
+		return rename($this->name, $value);
 	}
 	
 	function delete() {}

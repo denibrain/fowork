@@ -73,7 +73,7 @@ class File extends FileSystemItem {
 	}
 
 	function delete() {
-		if (!\unlink($this->name))
+		if ($this->exists && !\unlink($this->name))
 		throw new \Exception("Cannot delete $this->name file");
 	}
 
