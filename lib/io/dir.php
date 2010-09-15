@@ -78,10 +78,8 @@ class Dir extends FileSystemItem implements \Iterator {
 				   \symlink($source, $target->name."/".$item->basename);
 				}
 				elseif ($item instanceof Dir) {
-					else {
-						echo "create Dir $target->name/$item->basename\n";
-						\array_push ($stack, array($item, $target->createChild($item->basename)));
-					}
+					echo "create Dir $target->name/$item->basename\n";
+					\array_push ($stack, array($item, $target->createChild($item->basename)));
 				}
 				else {
 					echo "copyFile  $target->name/$item->basename\n";
