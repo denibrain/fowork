@@ -3,54 +3,74 @@
 namespace FW\IO;
 
 class File extends FileSystemItem {
-	const CREATE = 8;
 	const WRITE = 1;
-	const READ = 2;
-	const APPEND = 4;
+	const CREATE = 2;
+	const EXCL = 8;
+	const READ = 4;
 	
 	private $handle;
+	private $locked = false;
 	static private $pathValidator;
-	
-	function __construct($name, $flags = 0, $path = '') {
+
+	public function getOpened() { return !!$this->handle && is_resource($this->handle); }
+
+	function __construct($name, $flags = false, $path = '') {
 		parent::__construct($name);
 		if ($path) {
 			File::$pathValidator->validate($path);
 			if (substr($path, -1) != '/') $path.='/';
 			$name = $path.$name;
 		}
-		if ($flags) $this->open($flags);
+		if ($flags!==false) $this->open($flags);
 	}
 
-	function open($mode) {
-		$modes = array('w', 'r', 'r+', 'a', 'a', 'a+', 'a+');
-		$mode = $modes[$mode & 7];
+	function open($mode = 0) {
+		$modes = array(1 => 'a', 'w',  'w',
+					  'r', 'r+', 'w+', 'w+'.
+					  'x', 'x',  'x',  'x',
+					  'x+','x+', 'x+', 'x+');
+
+		$mode = $modes[$mode & 15];
 		if (!($this->handle = @fopen($this->name, $mode)))
 			throw new \Exception("Cannot create file $this->name($mode)");
 	}
 
 	function close() {
-		if (is_resource($this->handle)) {
+		if ($this->opened) {
+			if ($this->locked) $this->unlock();
 			fclose($this->handle);
 			$this->handle = NULL;
 		}
 	}
 
-	function __destruct() {
-		if (is_resource($this->handle))
-			fclose($this->handle);
-	}
-	
+	function __destruct() {	if ($this->opened) $this->close();	}
 	function getSize($key) {return filesize($this->name);}
 
 	function write($str) {
 		if (!$this->handle) {
-			$this->open(File::WRITE);
+			$this->open(File::CREATE | File::WRITE);
 			$this->lock(File::WRITE);
 		}
-		fwrite($this->handle, $str);
+		\fwrite($this->handle, $str);
 	}
 	
-	function writeln($str) {fwrite($this->handle, $str.PHP_EOL);}
+	function writeln($str) {
+		if (!$this->handle) {
+			$this->open(File::CREATE | File::WRITE);
+			$this->lock(File::WRITE);
+		}
+		\fwrite($this->handle, $str.PHP_EOL);
+	}
+
+	function read($max = 2048) {
+		if (!$this->handle) $this->open(File::READ);
+		return \fread($this->handle, $max);
+	}
+
+	function readln() {
+		if (!$this->handle) $this->open(File::READ);
+		return \fgets($this->handle);
+	}
 
 	function delete() {
 		if (!\unlink($this->name))
@@ -67,6 +87,17 @@ class File extends FileSystemItem {
 		throw new Exception("$targetkName not found");
 		if (!\symlink($linkName, $this->name))
 		throw new Exception("Cannot create link $this->name for $targetName file");
+	}
+
+	function lock($mode) {
+		$mode = $mode == File::READ ? LOCK_SH : LOCK_EX;
+		flock($this->handle, $mode);
+		$this->locked = true;
+	}
+
+	function unlock() {
+		flock($this->handle, LOCK_UN);
+		$this->locked = false;
 	}
 
 	static function init() {

@@ -21,3 +21,9 @@ spl_autoload_register(function ($name) {
 
 require FW_LIB."shortcuts.php";
 require FW_LIB."config.php";
+
+if (\function_exists('main')) {
+	$app = new App\ConsoleApp();
+	$app->run();
+}
+

@@ -19,6 +19,6 @@ class ConsoleApp extends App {
 	}
 
 	function run() {
-		__run($this);
+		\main($this);
 	}
 }

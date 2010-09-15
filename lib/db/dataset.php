@@ -318,7 +318,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$this->curTable = $this->mainTable;
 		}
 	}
-	
+
 	private function prWhere($type, $v, $pos, $proc) {
 		switch ($type) {
 			
@@ -401,10 +401,11 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			case 'str2':
 				$params = $this->params;
 				$cond = &$this->cond;
+				//array($this, 'stringSubsParam')
 				$v = preg_replace_callback('/:{([a-z0-9]+)}/i',
-					function($matches) use ($params, &$cond){
+					function($matches) use ($params, &$cond) {
 						$v = $matches[1];
-						if (isset($self->params[$v])) return $self->params[$v];
+						if (isset($params[$v])) return $params[$v];
 						
 						if($cond === false) throw new \Exception("Param $v is absent");
 						else ++$cond;						
