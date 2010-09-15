@@ -62,7 +62,8 @@ class Dir extends FileSystemItem implements \Iterator {
 	}
 	public function current() { 
 		$name = "$this->name/$this->data";
-		return is_dir($name) ? new Dir($name) : new File($name);
+		if (is_dir($name)) return new Dir($name);
+		return new File($name);
 	}
 
 	function copyTo($target) {
@@ -72,10 +73,18 @@ class Dir extends FileSystemItem implements \Iterator {
 		while ($stack) {
 			list($dir, $target) = array_pop($stack);
 			foreach ($dir as $item) {
-				if ($item instanceof Dir)
-					\array_push ($stack, array($item, $target->createChild($item->basename)));
-				else
+				if ($item instanceof Dir) {
+					if (\is_link($item->name))
+						copy($this->name, $target->name."/".$item->basename);
+					else {
+						echo "create Dir $target->name/$item->basename\n";
+						\array_push ($stack, array($item, $target->createChild($item->basename)));
+					}
+				}
+				else {
+					echo "copyFile  $target->name/$item->basename\n";
 					$item->copyTo($target->name."/".$item->basename);
+				}
 			}
 		}
 	}
