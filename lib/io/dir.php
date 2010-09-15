@@ -73,9 +73,11 @@ class Dir extends FileSystemItem implements \Iterator {
 		while ($stack) {
 			list($dir, $target) = array_pop($stack);
 			foreach ($dir as $item) {
-				if ($item instanceof Dir) {
-					if (\is_link($item->name))
-						copy($this->name, $target->name."/".$item->basename);
+				if (\is_link($item->name)) {
+					$source = \readlink($item->name);
+				   \symlink($source, $target->name."/".$item->basename);
+				}
+				elseif ($item instanceof Dir) {
 					else {
 						echo "create Dir $target->name/$item->basename\n";
 						\array_push ($stack, array($item, $target->createChild($item->basename)));
