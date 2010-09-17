@@ -28,8 +28,10 @@ class Dir extends FileSystemItem implements \Iterator {
 
 	function delete() {
 		if (!$this->exists) throw new \Exception("Directory $this->name not exists!");
-		foreach($this as $item) 
-			$item->delete();
+		foreach($this as $item) {
+			if (is_link($item->name)) unlink($item->name);
+			else $item->delete();
+		}
 		\rmdir($this->name);
 	}
 	
@@ -46,6 +48,7 @@ class Dir extends FileSystemItem implements \Iterator {
 	    do {
 			$this->data = $this->dir->read();
 	    } while ($this->data && ($this->data == '.' || $this->data == '..'));
+		
 	    return false !== ($this->data);
 	}
 	public function rewind() { 
@@ -60,6 +63,7 @@ class Dir extends FileSystemItem implements \Iterator {
 	public function next() { 
 	    $this->no++; 
 	}
+	
 	public function current() { 
 		$name = "$this->name/$this->data";
 		if (is_dir($name)) return new Dir($name);
