@@ -17,8 +17,8 @@ namespace FW\Web {
 			parent::__construct($root);
 			$this->mm->addPath(dirname(__FILE__).'/modules/');
 
-			if (defined('FW_PTH_TEMP'))
-				ini_set('session.save_path', FW_PTH_TEMP);
+//			if (defined('FW_PTH_TEMP'))
+//				ini_set('session.save_path', FW_PTH_TEMP);
 			session_start();  // TODO remove and use session module
 
 		}
