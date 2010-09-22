@@ -109,6 +109,19 @@ class File extends FileSystemItem {
 		if ($f->exists) $f->delete();
 		copy($this->name, $name);
 	}
+
+	function backup() {
+		if (!@copy($this->name, $this->name.'.bak'))
+			throw new Exception("Cannot create backup");
+	}
+
+	function restore() {
+		if (!file_exists($this->name.'.bak'))
+			throw new Exception("Backup not found");
+		if (!@copy($this->name.'.bak', $this->name))
+			throw new Exception("Cannot restore from backup");
+
+	}
 }
 
 File::init();
