@@ -16,6 +16,20 @@ class Server extends \FW\Object {
 	public function __construct() {
 		$this->connected = false;
 		$this->handle = NULL;
+
+		pcntl_signal(SIGTERM, array($this, "signalHandler"));
+		pcntl_signal(SIGHUP, array($this, "signalHandler"));
+	}
+
+	public function signalHandler($signal) {
+        switch($signal) {
+            case SIGTERM:
+                $this->stopServer();
+                exit;
+            case SIGHUP:
+                $this->stopServer();
+                exit;
+        }
 	}
 	
 	public function run($host = '127.0.0.1', $port = 1000) {
@@ -105,10 +119,7 @@ class Server extends \FW\Object {
 					if($keepAlive === false){
 						$this->dropSocket($id);
 					}
-					elseif($keepAlive === null){
-						$this->stopServer();
-					}
-					
+		
 				}catch(ESocketServer $ex){
 					$this->dropSocket($id);
 					throw $ex; #
@@ -122,11 +133,11 @@ class Server extends \FW\Object {
 	}
 	
 	private function doServe() {
-		while(true) {
+		while(!$this->stopState || count($this->connections)) {
+
 			if(!$this->stopState) {
 				$this->checkNewConnections();
 			}
-
 
 			if(count($this->connections)) {
 				$this->proceedConnections();
@@ -143,7 +154,7 @@ class Server extends \FW\Object {
 		if(isset($this->connections[$id])){
 			unset($this->connections[$id]);
 		}
-		if(isset($this->socks)){
+		if(isset($this->socks[$id])){
 			unset($this->socks[$id]);
 		}
 		@socket_shutdown($socket, 2);
