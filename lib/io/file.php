@@ -15,6 +15,7 @@ class File extends FileSystemItem implements \Iterator {
 	static private $pathValidator;
 
 	public function getOpened() { return !!$this->handle && is_resource($this->handle); }
+	public function getSize($key) {return filesize($this->name);}
 
 	function __construct($name, $flags = false, $path = '') {
 		parent::__construct($name);
@@ -46,7 +47,6 @@ class File extends FileSystemItem implements \Iterator {
 	}
 
 	function __destruct() {	if ($this->opened) $this->close();	}
-	function getSize($key) {return filesize($this->name);}
 
 	function write($str) {
 		if (!$this->handle) {
@@ -114,16 +114,16 @@ class File extends FileSystemItem implements \Iterator {
 
 	function backup() {
 		if (!@copy($this->name, $this->name.'.bak'))
-			throw new Exception("Cannot create backup");
+			throw new \Exception("Cannot create backup");
 	}
 
 	function restore() {
 		if (!file_exists($this->name.'.bak'))
-			throw new Exception("Backup not found");
+			throw new \Exception("Backup not found");
 		if (!@copy($this->name.'.bak', $this->name))
-			throw new Exception("Cannot restore from backup");
+			throw new \Exception("Cannot restore from backup");
 		if (!\unlink($this->name.'.bak'))
-			throw new Exception("Cannot delete backup");
+			throw new \Exception("Cannot delete backup");
 
 
 	}
@@ -152,6 +152,12 @@ class File extends FileSystemItem implements \Iterator {
 
 	public function current() {
 		return $this->data;
+	}
+
+	public function rename($newName) {
+		if (!@\rename($this->name, $newName))
+			throw new \Exception("Cannot rename file");
+		$this->name = $newName;
 	}
 }
 
