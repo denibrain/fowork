@@ -2,13 +2,15 @@
 
 namespace FW\IO;
 
-class File extends FileSystemItem {
+class File extends FileSystemItem implements \Iterator {
 	const WRITE = 1;
 	const CREATE = 2;
 	const EXCL = 8;
 	const READ = 4;
 	
 	private $handle;
+	private $lineNo = 0;
+	private $data;
 	private $locked = false;
 	static private $pathValidator;
 
@@ -120,7 +122,36 @@ class File extends FileSystemItem {
 			throw new Exception("Backup not found");
 		if (!@copy($this->name.'.bak', $this->name))
 			throw new Exception("Cannot restore from backup");
+		if (!\unlink($this->name.'.bak'))
+			throw new Exception("Cannot delete backup");
 
+
+	}
+
+	public function key() { return $this->lineNo;}
+
+	public function valid() {
+		$valid = !\feof($this->handle);
+
+		if ($valid)
+			$this->data = \fgets($this->handle);
+
+	    return $valid && false !== ($this->data);
+	}
+
+	public function rewind() {
+		if ($this->lineNo) {
+			$this->lineNo = 0;
+			\fseek($this->handle, 0);
+		}
+	}
+
+	public function next() {
+	    $this->lineNo++;
+	}
+
+	public function current() {
+		return $this->data;
 	}
 }
 
