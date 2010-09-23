@@ -21,12 +21,13 @@ class File extends FileSystemItem implements \Iterator {
 	public function getSize($key) {return filesize($this->name);}
 
 	function __construct($name, $flags = false, $path = '') {
-		parent::__construct($name);
 		if ($path) {
 			File::$pathValidator->validate($path);
 			if (substr($path, -1) != '/') $path.='/';
 			$name = $path.$name;
 		}
+
+		parent::__construct($name);
 		if ($flags!==false) $this->open($flags);
 	}
 
