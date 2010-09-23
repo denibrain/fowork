@@ -9,6 +9,9 @@ class File extends FileSystemItem implements \Iterator {
 	const READ = 4;
 	
 	private $handle;
+	private $buffer;
+	private $bufferSize;
+	private $bufferPointer;
 	private $lineNo = 0;
 	private $data;
 	private $locked = false;
@@ -36,6 +39,10 @@ class File extends FileSystemItem implements \Iterator {
 		$mode = $modes[$mode & 15];
 		if (!($this->handle = @fopen($this->name, $mode)))
 			throw new \Exception("Cannot create file $this->name($mode)");
+
+		$this->buffer = '';
+		$this->bufferSize = 0;
+		$this->bufferPointer = 0;
 	}
 
 	function close() {
@@ -69,9 +76,44 @@ class File extends FileSystemItem implements \Iterator {
 		return \fread($this->handle, $max);
 	}
 
-	function readln() {
+	private function loadBuffer($size) {
+		if (feof($this->handle)) return false;
+		$this->buffer = \fread($this->handle, $size);
+		$this->bufferSize = strlen($this->buffer);
+		$this->bufferPointer = 0;
+		if (!$this->bufferSize) return false;
+		return true;
+	}
+
+	function readln($lineMax = 2048) {
 		if (!$this->handle) $this->open(File::READ);
-		return \fgets($this->handle);
+
+		if ($this->bufferPointer == $this->bufferSize) {
+			if (!$this->loadBuffer($lineMax << 1)) return false;
+		}
+
+		$pos = \strpos($this->buffer, "\n", $this->bufferPointer);
+		$data = '';
+		if (false!==$pos) {
+			$data = \substr($this->buffer, $this->bufferPointer, $pos - $this->bufferPointer);
+			$this->bufferPointer = $pos + 1;
+		} else {
+			$data = \substr($this->buffer, $this->bufferPointer);
+			$this->bufferPointer = $this->bufferSize;
+			if ($this->loadBuffer($lineMax << 1)) {
+				$pos = \strpos($this->buffer, "\n", $this->bufferPointer);
+				if ($pos === false) {
+					$data .= $this->buffer;
+					$this->bufferPointer = $this->bufferSize;
+				} else {
+					$data .= \substr($this->buffer, 0, $pos);
+					$this->bufferPointer = $pos + 1;
+				}
+			}
+			if (strlen($data) > $lineMax)
+				throw new \Exception ('Line is too long');
+		}
+		return \rtrim($data, "\r\n");
 	}
 
 	function delete() {
@@ -131,12 +173,7 @@ class File extends FileSystemItem implements \Iterator {
 	public function key() { return $this->lineNo;}
 
 	public function valid() {
-		$valid = !\feof($this->handle);
-
-		if ($valid)
-			$this->data = \fgets($this->handle);
-
-	    return $valid && false !== ($this->data);
+	    return false!== $this->data = $this->readln();
 	}
 
 	public function rewind() {
@@ -154,7 +191,9 @@ class File extends FileSystemItem implements \Iterator {
 		return $this->data;
 	}
 
-	public function rename($newName) {
+	public function setName($newName) {
+		if (file_exists($newName) && !@\unlink($newName))
+			throw new \Exception("Cannot delete $newName file");
 		if (!@\rename($this->name, $newName))
 			throw new \Exception("Cannot rename file");
 		$this->name = $newName;
