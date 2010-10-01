@@ -171,7 +171,7 @@ class App extends \FW\Object {
 		return $h->call();
 	}
 
-	function content($expr, $params, $prefix = 'display') {
+	function content($expr, $params = array(), $prefix = 'display') {
 		$h = $params instanceof THCall ? $params : new THCall($params, $prefix);
 		$h->init();
 		$this->exparser->compile($expr, array($h, 'proceed'));
