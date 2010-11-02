@@ -44,7 +44,9 @@ class Field extends \FW\VCL\Component {
 	}
 
 	function getComment() { return $this->comment; }
+	function setComment($value) { $this->comment = $value; }
 	function getCaption() { return $this->caption; }
+	function setCaption($value) { $this->caption = $value; }
 	function getRequire() { return $this->require; }
 	function getValue() { return $this->value; }
 	function setValue($value) {
