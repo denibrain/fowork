@@ -120,9 +120,33 @@ class App extends \FW\Object {
 		$this->systemLog->write($str);
 	}
 	
-	// TODO mail
-	function mailMe($message) {
-		
+	/**
+	 * Send message via E-mail and add to table message
+	 * @param Element $message
+	 * @param string $template (xsl)
+	 * @param int $to - user ID, 0 - system
+	 * @param int $from - user ID, - system
+	 */
+	function message($message, $template, $to = 0, $from = 0) {
+		$users = array(0=> array('id'=>0, 'name'=>'System', 'email'=> FW_MAIL));
+		foreach(Q("auth.user[id IN ($to, $from)]") as $user) $users[$user['id']] = $user;
+
+		$text = $this->transform($message, 'letter.'.$template);
+		$caption = 'Сообщение';
+
+		$templateInfo = Q("converse.template [id = :template]", A('template', $template))->getA();
+		if ($templateInfo && $templateInfo['wrapper']) {
+			$wmessage = E('letter', E('to', $users[$to]), E('from', $users[$from]), A('text', $text));
+			$text = $this->transform($wmessage, 'lwrapper.'.$templateInfo['wrapper']);
+			$caption = $templateInfo['caption'];
+			if ($caption == '?') {
+				$caption = $this->transform($message, 'lcaption.'.$template);
+			}
+		}
+		$this->mailTo($text, $caption, $users[$to]['email']);
+		X("INSERT INTO converse.message (user_id, sender_id, name, thread_id, active, createdate, code, type, text)
+			VALUES (:?, :?, :?, NULL, TRUE, now(), :?, 'email', :?)",
+			$to?$to:NULL, $from?$from:NULL, $caption, $template, $text);
 	}
 	
 	function mailTo($text, $topic='Сообщение робота', $to='') {

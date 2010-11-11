@@ -173,7 +173,7 @@ class SMTP extends Object {
 	
 		// по стандарту не желательно отправлять строки длиной более 1000 символов
 		// если новая строчка начинаестя с точки (символ конца данных), точку дублируем
-		$lines = explode("\n", str_replace(array("\r\n", "\r"), "\n", $msg_data));
+		$lines = explode("\n", str_replace(array("\r\n", "\r"), "\n", trim($msg_data)));
 
 		// определяем есть ли заголвки
 		$sp = strpos($lines[0], " "); $dv = strpos($lines[0],":");
@@ -192,11 +192,12 @@ class SMTP extends Object {
 				elseif(strlen($line_out) > 0 && $line_out[0] == ".")
 					$line_out = "." . $line_out;
 				$this->put($line_out, 0, true);
+
 			}
 		}
 
 		// message data has been sent
-		$this->put(PHP_EOL.".", 250);
+		$this->put(".", 250);
 	}
 
 	// HELO <SP> <domain> <CRLF>
@@ -256,12 +257,12 @@ class SMTP extends Object {
 			// if 4th character is a space, we are done reading, break the loop
 			if(substr($str,3,1) == " ") break;
 		}
-		$this->log->write("\n<= $data");
+		$this->log->write("<= $data");
 		return new SMTPReplay($data);
 	}
 
 	private function put($str, $expectCode = 0, $continue = false) {
-		$this->log->write("\n => $str\n");
+		$this->log->write(" => $str");
 		fputs($this->handle, $str.PHP_EOL);
 		if(!$continue) {
 			$r = $this->recieve();

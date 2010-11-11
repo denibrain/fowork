@@ -41,12 +41,14 @@ function X(/* ... */) {
 	return FW\App\App::$_->db->execute(call_user_func_array(array(FW\App\App::$_->db, 'format'), func_get_args()));
 }
 
-function he($a) { return T($a)->html; }
-function remle($a) { return T($a)->remEOL(); }
-function fixle($a) { return T($a)->setEOL(); }
-
 function F($name) {
 	return new FW\IO\File($name);
 }
+
+function DT($dt = false) { return new FW\Util\DateTime($dt); }
+
+function he($a) { return T($a)->html; }
+function remle($a) { return T($a)->remEOL(); }
+function fixle($a) { return T($a)->setEOL(); }
 
 ?>
