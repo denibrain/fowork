@@ -1,5 +1,7 @@
 <?php
 namespace FW\Net\Sockets;
+declare(ticks = 1);
+
 
 class Server extends \FW\Object {
 	
@@ -17,6 +19,7 @@ class Server extends \FW\Object {
 		$this->connected = false;
 		$this->handle = NULL;
 
+		pcntl_signal_dispatch();
 		pcntl_signal(SIGTERM, array($this, "signalHandler"));
 		pcntl_signal(SIGHUP, array($this, "signalHandler"));
 	}
@@ -24,6 +27,8 @@ class Server extends \FW\Object {
 	public function signalHandler($signal) {
         switch($signal) {
             case SIGTERM:
+				echo "stopping...\n";
+
                 $this->stopServer();
                 exit;
             case SIGHUP:

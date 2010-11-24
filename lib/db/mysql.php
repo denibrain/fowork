@@ -36,6 +36,15 @@ class MySQL extends DB {
 		$this->connected = false;
 	}
 
+	function ping() {
+		return mysql_ping($this->handle);
+	}
+
+	function reconnect() {
+		$this->connected = false;
+		$this->open();
+	}
+
 	public function begin() {
 		if (!$this->level) $this->execute("START TRANSACTION");
 		$this->level++;

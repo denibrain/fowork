@@ -143,6 +143,7 @@ class App extends \FW\Object {
 				$caption = $this->transform($message, 'lcaption.'.$template);
 			}
 		}
+
 		$this->mailTo($text, $caption, $users[$to]['email']);
 		X("INSERT INTO converse.message (user_id, sender_id, name, thread_id, active, createdate, code, type, text)
 			VALUES (:?, :?, :?, NULL, TRUE, now(), :?, 'email', :?)",
