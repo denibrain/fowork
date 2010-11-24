@@ -19,9 +19,10 @@ class Server extends \FW\Object {
 		$this->connected = false;
 		$this->handle = NULL;
 
-		pcntl_signal_dispatch();
-		pcntl_signal(SIGTERM, array($this, "signalHandler"));
-		pcntl_signal(SIGHUP, array($this, "signalHandler"));
+		\pcntl_signal_dispatch();
+		\file_put_contents('server.pid', posix_getpid());
+		\pcntl_signal(SIGTERM, array($this, "signalHandler"));
+		\pcntl_signal(SIGHUP, array($this, "signalHandler"));
 	}
 
 	public function signalHandler($signal) {
