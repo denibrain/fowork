@@ -176,6 +176,7 @@ class DB extends \FW\Object {
 	public function begin() {}
 	public function rollback() {}
 	public function commit() {}
+	public function ping() {}
 }
 
 class EDB extends \Exception {

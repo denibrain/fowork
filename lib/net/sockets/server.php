@@ -2,7 +2,6 @@
 namespace FW\Net\Sockets;
 declare(ticks = 1);
 
-
 class Server extends \FW\Object {
 	
 	private $handle; // server socket
