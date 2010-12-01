@@ -73,6 +73,10 @@ class Process extends \FW\Object {
 		}
 	}
 
+	function getStatus() {
+		return \proc_get_status($this->handle);
+	}
+
 	function read() {
 		if (feof($this->pipes[Process::OUT_PIPE])) return false;
 		return stream_get_contents($this->pipes[Process::OUT_PIPE]);

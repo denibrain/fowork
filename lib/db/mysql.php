@@ -23,7 +23,7 @@ class MySQL extends DB {
     
     function open() {
         if (false===($this->handle = @mysql_connect("$this->host:$this->port", $this->user, $this->pass, true)))
-            throw new EDB("Cannot connect DB to $this->host");
+            throw new EDB("Cannot connect DB to $this->host: ". mysql_error());
         if (false===mysql_select_db($this->dbname, $this->handle))
             throw new EMySQL($this->handle);
 		
