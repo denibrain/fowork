@@ -166,6 +166,7 @@ class Element extends \FW\Object {
 	}
 
 	function loadFromXML($xml) {
+		if (substr($xml, 0, 2)!='<?') $xml = '<?xml version="1.0" encoding="'.FW_CHARSET.'" ?>'.$xml;
 		$xml = \simplexml_load_string($xml);
 		$this->tagName = $xml->getName();
 		$this->importNode(get_object_vars($xml));

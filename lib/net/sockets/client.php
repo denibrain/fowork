@@ -18,11 +18,11 @@ class Client extends \FW\Object {
 	 * @throws ESocketClient
 	 **/
 	public function connect() {
-		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		$this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if ($this->socket === false)
 			throw new ESocketClient();
 		
-		if (socket_connect($this->socket, $this->host, $this->port) === false)
+		if (@socket_connect($this->socket, $this->host, $this->port) === false)
 			throw new ESocketClient($this->socket);
 		$this->connected = true;
 	}

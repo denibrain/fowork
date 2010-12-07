@@ -5,7 +5,7 @@
 # Output colorized text to terminal run
 # php scripts..
 ##############################################
-function termcolored($text, $color="NORMAL", $back=1){
+function cecho($text, $color="NORMAL", $back=0){
 $_colors = array(
         'LIGHT_RED'      => "[1;31m",
         'LIGHT_GREEN'     => "[1;32m",
@@ -30,7 +30,7 @@ $_colors = array(
     if($back){
         return chr(27)."$out$text".chr(27)."[0m";#.chr(27);
     }else{
-        echo chr(27)."$out$text".chr(27).chr(27)."[0m";#.chr(27);
+        echo chr(27)."$out$text".chr(27)."[0m";#.chr(27);
     }//fi
 }// end function
 ##############################################
