@@ -10,9 +10,10 @@ class ArrayValidator extends Validator {
 	}
 	
 	function validate($value) {
-		if (!is_array($value)) 
+		if (!is_array($value))
 			throw new EValidate('ArrayValidator.dataType');
-		foreach($value as $item)
+		foreach($value as $item) {
 			$this->validator->validate($item);
+		}
 	}
 }

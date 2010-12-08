@@ -17,7 +17,7 @@ class ValidateStack extends Validator {
 				$this->stack[] = new Constant($a);
 			}
 			elseif (!($a instanceof $name))
-				throw new EValidate('Validator.system', 'INvalid argument $k');
+				throw new EValidate('Validator.system', "INvalid argument $k");
 			else
 				$this->stack[] = $a;
 		}
