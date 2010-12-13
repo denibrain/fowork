@@ -79,7 +79,7 @@ class App extends \FW\Object {
 		}
 		if (false!==$pos) {
 			$dName = \strtolower(substr($name, 0, $pos));
-			if ($dName ==='page' || $dName ==='grid' || $dName ==='form') {
+			if ($dName ==='page' || $dName ==='grid' || $dName ==='form'  || $dName ==='component') {
 				$fileName =  FW_PTH_COMPONENTS.\strtolower(\str_replace('\\', '/', $name)).'.php';
 				if (file_exists($fileName))
 					require $fileName;

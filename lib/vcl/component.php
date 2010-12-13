@@ -25,6 +25,8 @@ class Component extends \FW\Object {
 		if ($pos !== false) $this->className = substr($this->className, $pos + 1);
 	}
 
+	function init($params) {}
+
 	function display() {
 		$skeleton = E($this->family, D($this, 'id,name,visible'), A('class', $this->className));
 		foreach($this->controls as $item)
