@@ -28,7 +28,8 @@ class XSLTransformer extends \FW\Object {
 				<!ENTITY mdash  "&#x2014;">
 				
 			]>'.$xmlraw)) {
-			throw new EApp("Invalid data for $transform");
+			echo \htmlentities($xmlraw);
+			throw new \Exception("Invalid data for $transform");
 		};
 		
 		if ($xslName) $this->template = $xslName;

@@ -1,4 +1,4 @@
->?php
+<?php
 namespace FW\VCL\Forms;
 
 class Int extends Field {
