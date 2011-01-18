@@ -13,7 +13,7 @@ class Field extends \FW\VCL\Component {
 	private $require;
 	private $caption;
 
-	public $validator;
+	public $validator = null;
 	public $filter;
 
 	public function __construct($name, $caption = '', $required = Field::REQUIRED, $comment = '', $value = '') {
@@ -23,6 +23,17 @@ class Field extends \FW\VCL\Component {
 		$this->require = $required;
 		$this->comment = $comment;
 		$this->value = $value;
+	}
+
+	public function addValidator(\FW\Validate\Validator $validator) {
+		if (isset($this->validator)) {
+			$v = new \FW\Validate\ValidateStack($this->validator);
+			$v->add($validator);
+			$this->validator = $v;
+		} else {
+			$this->validator = $validator;
+		}
+		return $this;
 	}
 
 	/* check value, if error exists then throw exception */

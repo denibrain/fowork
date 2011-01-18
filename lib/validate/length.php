@@ -7,8 +7,8 @@ namespace FW\Validate;
  */
 class Length extends Validator  {
 
-	private $maxlen = false;
-	private $minlen = false;
+	private $max = false;
+	private $min = false;
 
 	function __construct($max, $min = false) {
 		$this->max = $max;
@@ -17,9 +17,9 @@ class Length extends Validator  {
 
 	function validate($value) {
 		if (false!==$this->max && strlen($value) > $this->max)
-			throw new EValidate('Length.max');
+			throw new EValidate('Length.max', strlen($value)." > $this->max");
 		if (false!==$this->min && strlen($value) < $this->min)
-			throw new EValidate('Length.min');
+			throw new EValidate('Length.min', strlen($value)." < $this->min");
 	}
 
 	protected function setMax($value) { if ($value < 0) $this->max = false; $this->max = (int) $value; }

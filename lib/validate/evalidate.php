@@ -7,6 +7,6 @@ class EValidate extends \Exception {
 
 	function __construct($code, $message = '') {
 		$this->code = $code;
-		parent::__construct("($code) $message");
+		parent::__construct($message);
 	}
 }; 
