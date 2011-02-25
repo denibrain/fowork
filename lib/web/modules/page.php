@@ -107,7 +107,7 @@ class Page extends FW\App\Module {
 			case 'tablename': return $this->tablename;
 			case 'caption': return $this->caption;
 			case 'url': return $this->url;
-			case 'title': return implode(" - ", $this->path);
+			case 'title': return implode(" - ", array_reverse($this->path));
 			case 'id': return $this->id;
 			default: return parent::__get($key);
 		}
