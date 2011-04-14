@@ -26,7 +26,13 @@ class URL extends \FW\Object {
 			throw new \Exception("Invalid level value");
 		return new URL(implode(".", array_slice($this->domain, $level)));
 	}
-	
+
+	function parentUrl($level = 1) {
+		if ($level < 0)
+			throw new \Exception("Invalid level value");
+		return new URL(implode(".", array_slice($this->domain, 0, -$level)));
+	}
+
 	function setAddress($u) {
 		if ($u && !preg_match('"(?:[a-z_.0-9]+/)*[a-z_.0-9]+"i', $u))
 			throw new \Exception("Invalid url");

@@ -54,7 +54,7 @@ class Module extends \FW\App\Module {
 			$result = $page->display();
 			
 			$db->commit();
-		} catch (\ERedirect $e) {
+		} catch (\ERequest $e) {
 			$db->commit();
 			throw $e;
 		}
