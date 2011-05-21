@@ -94,7 +94,7 @@ class PgSQLQuery extends Query {
     function getA() { return \pg_fetch_assoc($this->handle);  }
     function get() { return \pg_fetch_row($this->handle);  }
     function count() {return \pg_num_rows($this->handle);  }
-	function seek($row = 0) { pg_result_seek($this->handle, $row); }
+	function seek($row = 0) { \pg_result_seek($this->handle, $row); }
 	function val() {
 		$d = \pg_fetch_row($this->handle);
 		return $d ? current($d) : false; }

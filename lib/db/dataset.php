@@ -21,6 +21,14 @@ class QueryField {
 	public $typecast = false;
 }
 
+class TableInfo {
+	public $alias;
+	public $outer = false;
+	public $ex = false;
+	public $realname;
+	public $joincl = array();
+}
+
 class DataSet extends \FW\Object implements \IteratorAggregate  {
 	
 	private $mode = FW_DSM_STATIC;
@@ -37,7 +45,6 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 	// Query properties
 	private $mainTable;
 	private $fieldAlias = array();
-	private $tableAlias = array();
 	private $sortables = array();
 	private $filterMask = '';
 	
@@ -56,7 +63,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 	private $order = array();
 	private $group = array();
 	private $having = array();
-	private $tables = array();
+	private $tables = array(); // by Aliases!
 	private $fields = array();
 	private $limit = false;
 	private $offset = false;
@@ -269,10 +276,11 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			case 'mtalias':
 			case 'alias':
 				$v = substr($v, 1);
-				if (isset($this->tableAlias[$v])) throw new \Exception("Duplicate table alias $v");
-				$this->tables[$this->tableAlias[$this->curTable]]['alias'] = $v;
-				$this->tableAlias[$v]=$this->tableAlias[$this->curTable];
-				$this->curTable = $v;
+				if (isset($this->tables[$v])) throw new \Exception("Duplicate table alias $v");
+
+				unset($this->tables[$this->curTable->alias]);
+				$this->curTable->alias = $v;
+				$this->tables[$v] = $this->curTable;
 				if (isset($this->undefinedTables[$v])) unset($this->undefinedTables[$v]);
 				break;
 			
@@ -283,7 +291,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			case 'where.end':
 				switch($proc->state) {
 					case 'where': if (!$this->cond) $this->where[] = $this->expr; break;
-					case 'joincl': $this->tables[$this->tableAlias[$this->curTable]]['joincl'][] = $this->expr; break;
+					case 'joincl': $this->curTable->joincl[] = $this->expr; break;
 					case 'having': if (!$this->cond) $this->having[] = $this->expr; break;
 					case 'order':
 						$order = (substr($this->expr, 0, 1) == '+'? ' ASC':' DESC'); 
@@ -305,7 +313,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$this->expr = '';
 				break;
 			case 'open2b': # alter join clasure
-				$this->tables[$this->tableAlias[$this->curTable]]['ex'] = 1;
+				$this->curTable->ex = 1;
 			case 'open2':  # where clasure
 			case 'open2a': # join clasure
 			case 'open2c':  # having clasure
@@ -318,7 +326,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$this->curTable = $this->mainTable;
 		}
 	}
-	
+
 	private function prWhere($type, $v, $pos, $proc) {
 		switch ($type) {
 			
@@ -399,13 +407,16 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				$v = strtoupper($v);
 			case 'str1':
 			case 'str2':
-				$self = $this;
+				$params = $this->params;
+				$cond = &$this->cond;
+				//array($this, 'stringSubsParam')
 				$v = preg_replace_callback('/:{([a-z0-9]+)}/i',
-					function($matches) use ($self){
+					function($matches) use ($params, &$cond) {
 						$v = $matches[1];
-						if (isset($self->params[$v])) return $self->params[$v];
-						if($self->cond === false) throw new \Exception("Param $v is absent");
-						else ++$self->cond;						
+						if (isset($params[$v])) return $params[$v];
+						
+						if($cond === false) throw new \Exception("Param $v is absent");
+						else ++$cond;						
 					}, $v);
 			case 'num':
 				$this->expr .= $v;
@@ -413,7 +424,7 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			
 			case 'mult':
 				if ($proc->state == 'begin') {
-					$this->expr = $this->db->q($this->curTable).".".($this->curField->name = '*');
+					$this->expr = $this->db->q($this->curTable->alias).".".($this->curField->name = '*');
 					break;
 				}
 				
@@ -447,17 +458,23 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				break;
 		}
 	}
+
+	private function getTableAliasByRealname($name) {
+		foreach($this->tables as $t)
+			if ($t->realname === $name) return $t->alias;
+		return false;
+	}
 	
 	private function parseField($f, $useAliases = false) {
 		if (false===($pos = strrpos($f,'.'))) {
 			if (!$useAliases || !isset($this->fieldAlias[$f])) {
-				return "$this->curTable.".$this->db->q($f);
+				return "{$this->curTable->alias}.".$this->db->q($f);
 			}
 		}
 		else {
 			$n = substr($f, 0, $pos);
-			if (!isset($this->tableAlias[$n])) {
-				if (isset($this->tables[$n])) $n = $this->tables[$n]['alias'];
+			if (!isset($this->tables[$n])) {
+				if (false!==($alias = $this->getTableAliasByRealname($n))) $n = $alias;
 				else {
 					$this->undefinedTables[$n] = $n;
 				}
@@ -487,19 +504,17 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 		$this->expr = '';
 		return array($name, $this->curField->computed);
 	}
-	
+
 	function addTable($name, $outer =  false) {
-		if (isset($this->tables[$name])) return $this->tables[$name]['alias'];
+		$t = new TableInfo();
+		$t->alias = $a = 't'.count($this->tables);
+		$t->outer = $outer;
+		$t->realname = $name;
+
 		if (isset($this->undefinedTables[$name])) unset($this->undefinedTables[$name]);
 		
-		$this->tables[$name] = array(
-			'alias' => $a = 't'.count($this->tables),
-			'outer' => $outer,
-			'joincl' => array(),
-			'ex' => 0
-		);
-		$this->tableAlias[$a] = $name;
-		return $a;
+		$this->tables[$a] = $t;
+		return $t;
 	}
 
 	private function compute() {
@@ -512,9 +527,11 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 			$sql .= implode(", ", $this->fields);
 		}
 
+
+
 		$tkeys = array_keys($this->tables);
-		$main = array_shift($tkeys);
-		$ma  = $this->tables[$main]['alias'];
+		$ma = array_shift($tkeys);
+		$main = $this->tables[$ma]->realname;
 		$sql.= " FROM ".$this->db->q($main)." AS $ma";
 
 		$prev = false;
@@ -522,22 +539,22 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 		$no = 0;
 		foreach($tkeys as $no => $key) {
 			$tinfo = $this->tables[$key];
-			$sql.= !$tinfo['outer'] ?" INNER":" LEFT";
-			$sql.= " JOIN ".$this->db->q($key). "AS {$tinfo['alias']} ON ";
+			$sql.= !$tinfo->outer ?" INNER":" LEFT";
+			$sql.= " JOIN ".$this->db->q($tinfo->realname). "AS {$key} ON ";
 			
 			$relation = false;
-			if (!$tinfo['ex']) {
-				$relation = $this->db->relation($main, $key, $ma, $tinfo['alias']);
+			if (!$tinfo->ex) {
+				$relation = $this->db->relation($main, $tinfo->realname, $ma, $key);
 				if (!$relation && $no) {
 					$prev = $tkeys[$no - 1];
-					$relation =	$this->db->relation($prev, $key,
-						$this->tables[$prev]['alias'], $tinfo['alias']);
+					$relation =	$this->db->relation($this->tables[$prev]->realname, $tinfo->realname, $prev,
+						 $key);
 					
 					if (!$relation && $no > 1) {
 						foreach($tkeys as $i=>$tk) if ($i!=$no && $i != $no - 1) {
 							$t = $this->tables[$tk];
 							if (false!==($relation =
-								$this->db->relation($tk, $key, $t['alias'], $tinfo['alias'])))
+								$this->db->relation($t->realname, $tinfo->realname, $tk, $key)))
 								break;
 						}
 					}
@@ -548,9 +565,9 @@ class DataSet extends \FW\Object implements \IteratorAggregate  {
 				}
 				$sql .= $relation;
 			}
-			if ($tinfo['joincl']) {
-				if (!$tinfo['ex']) $sql.= ' AND ';
-				$sql.= "(".implode(") AND (", $tinfo['joincl']).")";
+			if ($tinfo->joincl) {
+				if (!$tinfo->ex) $sql.= ' AND ';
+				$sql.= "(".implode(") AND (", $tinfo->joincl).")";
 			}
 		}
 		$this->sql = $sql;

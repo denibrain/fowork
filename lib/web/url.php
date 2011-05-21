@@ -63,6 +63,3 @@ class URL extends \FW\Object {
 		}
 	}
 }
-
-
-?>

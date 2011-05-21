@@ -13,7 +13,7 @@ class Field extends \FW\VCL\Component {
 	private $require;
 	private $caption;
 
-	public $validator;
+	public $validator = null;
 	public $filter;
 
 	public function __construct($name, $caption = '', $required = Field::REQUIRED, $comment = '', $value = '') {
@@ -25,6 +25,17 @@ class Field extends \FW\VCL\Component {
 		$this->value = $value;
 	}
 
+	public function addValidator(\FW\Validate\Validator $validator) {
+		if (isset($this->validator)) {
+			$v = new \FW\Validate\ValidateStack($this->validator);
+			$v->add($validator);
+			$this->validator = $v;
+		} else {
+			$this->validator = $validator;
+		}
+		return $this;
+	}
+
 	/* check value, if error exists then throw exception */
 	public function validate($newValue) {
 		if ($newValue === '' && $this->require == Field::REQUIRED)
@@ -33,7 +44,7 @@ class Field extends \FW\VCL\Component {
 			try {
 				$this->validator->validate($newValue);
 			} catch (\FW\Validate\EValidate $e) {
-				throw new EFormData($e->code, $this->name);
+				throw new EFormData($e->code, $this->name, $e->getMessage());
 			}
 	}
 
@@ -44,7 +55,9 @@ class Field extends \FW\VCL\Component {
 	}
 
 	function getComment() { return $this->comment; }
+	function setComment($value) { $this->comment = $value; }
 	function getCaption() { return $this->caption; }
+	function setCaption($value) { $this->caption = $value; }
 	function getRequire() { return $this->require; }
 	function getValue() { return $this->value; }
 	function setValue($value) {

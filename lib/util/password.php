@@ -16,24 +16,17 @@ class Password extends \FW\Object {
 			if (rand(0, 10) > 5) return strtoupper($l);
 			else return $l;
 		}
-
 		elseif ($type == 'G') {
-			$a = array('a', 'e', 'u', 'i', 'o');
-			$l = $a[rand(0, 4)];
-			if (rand(0, 10) > 5) return strtoupper($l);
-			else return $l;
+			$a = 'aeuioAEUIO';
+			return $a[rand(0, 9)];
 		}
 		elseif ($type == 'S') {
-			$b = array('q', 'w', 'r', 't', 'y', 'p', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm');
-			$l = $b[rand(0, 20)];
-			if (rand(0, 10) > 5) return strtoupper($l);
-			else return $l;
+			$b = 'qwrtypsdfghjklzxcvbnmQWRTYPSDFGHJKLZXCVBNM';
+			return $b[rand(0, 41)];
 		}
 		elseif ($type == 'X') {
-			$c = array('_', '-', '%', '#', '@', '!');
-			$l = $c[rand(0, 5)];
-			if (rand(0, 10) > 5) return strtoupper($l);
-			else return $l;
+			$c = '_-%#@!';
+			return $c[rand(0, 5)];
 		}
 		elseif ($type == 'N') {
 			return rand(0, 9);

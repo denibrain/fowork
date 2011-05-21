@@ -183,6 +183,13 @@ class DateTime extends \FW\Object {
 		return $this;
 	}
 
+	/**
+	 * Get interval in $unit between $this & $sub: $this - $sub
+	 * 1970-06-02 - 1970-06-01 = 1 DAY
+	 * @param \FW\Util\DateTime $sub
+	 * @param int $unit : IDAY/IYEAR/IMONTH
+	 * @return int
+	 */
 	function interval($sub, $unit) {
 		if ($unit == DateTime::IDAY) return $this->__get('days') - $sub->__get('days');
 		else

@@ -1,21 +1,22 @@
 <?php
-namespace FW\Net;
+namespace FW\Net\Sockets;
 
-class Context
-{
+class Context extends \FW\Object {
 	protected $socket;
+
+	public function getSocket()	{ return $this->socket;	}
 	
 	function __construct($socket) {
 		$this->socket = $socket;
 	}
 	
-	public function proceed()
-	{
-		
-	}
+	public function proceed(){}
 	
-	public function read()
-	{
+	/**
+	* пишет в сокет строку
+	* @param String $buf
+	*/
+	public function read() {
 		$buf = '';
 		$buf = @socket_read($this->socket, 0xffff);
 		if($buf === false){
@@ -26,39 +27,18 @@ class Context
 		return $buf;
 	}
 	
-	public function write($buf)
-	{
+	/**
+	* пишет в сокет строку
+	* @param String $buf
+	*/
+	public function write($buf) {
 		if(@socket_write($this->socket, $buf) === false){
 			$eCode = socket_last_error();
 			throw new ESocketServer(socket_strerror($eCode), $eCode);
 		}
 	}
-	
-	public function close()
-	{
-		
+
+	public function close(){
+		socket_close($this->socket);
 	}
-	
-	public function getSocket()
-	{
-		return $this->socket;
-	}
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

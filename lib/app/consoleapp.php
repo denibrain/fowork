@@ -17,5 +17,8 @@ class ConsoleApp extends App {
 		$this->script = array_shift($argv);
 		$this->params = $argv;
 	}
+
+	function run() {
+		\main($this);
+	}
 }
-?>

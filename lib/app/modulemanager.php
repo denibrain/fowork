@@ -1,12 +1,16 @@
 <?php
 namespace FW\App;
 
-class ModuleManager extends \FW\Object {
+class ModuleManager extends \FW\Object implements \IteratorAggregate {
 	
 	private $path = array();
 	private $cache;
 	private $app;
-	
+
+	function getIterator() {
+		return new \ArrayIterator($this->cache);
+	}
+
 	function __construct($app, $path = '') {
 		$this->app = $app;
 		$this->cache = array();
@@ -48,7 +52,7 @@ class ModuleManager extends \FW\Object {
 
 	function load($name) {
 		foreach($this->path as $path) {
-			$modulfile = $path.$name.'.php';
+			$modulfile = strtolower($path.$name.'.php');
 			if (file_exists($modulfile)) {
 				require_once $modulfile;
 				return;

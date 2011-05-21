@@ -6,7 +6,7 @@ class EFormData extends \Exception {
 	private $codeName;
 	private $field;
 	
-	function EFormData($code, $field, $message = '') {
+	function __construct($code, $field, $message = '') {
 		parent::__construct($message ? $message : $code);
 		$this->codeName = $code;
 		$this->field = $field;

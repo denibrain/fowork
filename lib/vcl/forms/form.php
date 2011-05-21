@@ -155,6 +155,7 @@ class Form extends \FW\VCL\Component implements \ArrayAccess {
 
 	function getCaption() { return $this->caption; }
 	function getAction() { return $this->action; }
+	function setAction($value) { return $this->action = $value; }
 	function getMethod() { return $this->method; }
 	function getStatus() { return $this->status; }
 	function getFields() { return $this->fields; }

@@ -26,7 +26,7 @@ class ObjectValidator extends Validator {
 		foreach($this->validators as $fieldName => $v) {
 			list($validator, $req) = $v;
 			if (!isset($value->$fieldName)) {
-				if ($req) throw new EValidate('ObjectValidator.fieldMissed');
+				if ($req) throw new EValidate('ObjectValidator.fieldMissed', $fieldName);
 			}
 			else
 				$validator->validate($value->$fieldName);

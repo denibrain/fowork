@@ -1,0 +1,7 @@
+<?
+
+class Locale extends Object {
+
+
+
+}

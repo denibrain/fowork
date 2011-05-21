@@ -47,17 +47,22 @@ class App extends \FW\Object {
 		date_default_timezone_set(FW_TIMEZONE);
 		set_exception_handler(array($this, "exceptionHandler"));
 
-		if (defined('FW_PTH_TEMP'))
-			ini_set('session.save_path', FW_PTH_TEMP);
-		session_start();  // TODO remove and use session module
-		
 		// load locale
 		if (file_exists(FW_PTH_LOCALE))
 		foreach(new \DirectoryIterator(FW_PTH_LOCALE) as $entry)
 			if (preg_match('/^'.FW_LANGUAGE.'(\.[a-z]+)?\.php$/', $entry))
 				require FW_PTH_LOCALE."$entry";
 
-		$this->systemLog = new \FW\Log\Log('system');
+		if (defined('FW_PTH_LOG'))
+			$this->systemLog = new \FW\Log\File('system');
+		elseif (defined('FW_TBL_LOG'))
+			$this->systemLog = new \FW\Log\Db('system');
+		elseif (defined('FW_MAIL_LOG'))
+			$this->systemLog = new \FW\Log\Mail('system');
+		else
+			$this->systemLog = new \FW\Log\Log('system');
+		//	$a = new \FW\Log\File('system');
+
 		$this->mm = new ModuleManager($this);
 		$this->xslt = new \FW\Text\XSLTransformer(FW_PTH_DESIGN."xsl/");
 		$this->txparser = new \FW\Text\Parser(FW_LIB.'/app/stx/caption.php');
@@ -74,7 +79,7 @@ class App extends \FW\Object {
 		}
 		if (false!==$pos) {
 			$dName = \strtolower(substr($name, 0, $pos));
-			if ($dName ==='page' || $dName ==='grid' || $dName ==='form') {
+			if ($dName ==='page' || $dName ==='grid' || $dName ==='form'  || $dName ==='component') {
 				$fileName =  FW_PTH_COMPONENTS.\strtolower(\str_replace('\\', '/', $name)).'.php';
 				if (file_exists($fileName))
 					require $fileName;
@@ -86,6 +91,9 @@ class App extends \FW\Object {
 	}
 
 	public function exceptionHandler($e) {
+		if (!$this->systemLog)
+			die("SYSLOG:FAIL WRITE ".$e->getMessage());
+
 		$this->systemLog->write(
 			sprintf("[%d] %s\nFile: %s:%d\nStack trace:\n",
 				$e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine() 
@@ -112,9 +120,34 @@ class App extends \FW\Object {
 		$this->systemLog->write($str);
 	}
 	
-	// TODO mail
-	function mailMe($message) {
-		
+	/**
+	 * Send message via E-mail and add to table message
+	 * @param Element $message
+	 * @param string $template (xsl)
+	 * @param int $to - user ID, 0 - system
+	 * @param int $from - user ID, - system
+	 */
+	function message($message, $template, $to = 0, $from = 0) {
+		$users = array(0=> array('id'=>0, 'name'=>'System', 'email'=> FW_MAIL));
+		foreach(Q("auth.user[id IN ($to, $from)]") as $user) $users[$user['id']] = $user;
+
+		$text = $this->transform($message, 'letter.'.$template);
+		$caption = 'Сообщение';
+
+		$templateInfo = Q("converse.template [id = :template]", A('template', $template))->getA();
+		if ($templateInfo && $templateInfo['wrapper']) {
+			$wmessage = E('letter', E('to', $users[$to]), E('from', $users[$from]), A('text', $text));
+			$text = $this->transform($wmessage, 'lwrapper.'.$templateInfo['wrapper']);
+			$caption = $templateInfo['caption'];
+			if ($caption == '?') {
+				$caption = $this->transform($message, 'lcaption.'.$template);
+			}
+		}
+
+		$this->mailTo($text, $caption, $users[$to]['email']);
+		X("INSERT INTO converse.message (user_id, sender_id, name, thread_id, active, createdate, code, type, text)
+			VALUES (:?, :?, :?, NULL, TRUE, now(), :?, 'email', :?)",
+			$to?$to:NULL, $from?$from:NULL, $caption, $template, $text);
 	}
 	
 	function mailTo($text, $topic='Сообщение робота', $to='') {
@@ -126,7 +159,7 @@ class App extends \FW\Object {
 				if (isset($text[1]) && $text[1]!='') $letter->html = $this->transform($text[0], $text[1]);
 				if (isset($text[2]) && $text[2]!='') $letter->text = $this->transform($text[0], $text[2]);
 			}
-		} else $mail->text = $text;
+		} else $letter->text = $text;
 
 		$letter->to = $to?$to:FW_MAILSITE;
 		$letter->subject =$topic;
@@ -163,7 +196,7 @@ class App extends \FW\Object {
 		return $h->call();
 	}
 
-	function content($expr, $params, $prefix = 'display') {
+	function content($expr, $params = array(), $prefix = 'display') {
 		$h = $params instanceof THCall ? $params : new THCall($params, $prefix);
 		$h->init();
 		$this->exparser->compile($expr, array($h, 'proceed'));

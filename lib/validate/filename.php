@@ -13,18 +13,18 @@ class Filename extends Mask {
 
 	private $type;
 
-	function __construct($type) {
+	function __construct($type = Filename::FULLPATH) {
 		$this->type = $type;
 
 		$mask = '';
 		if ($type & 1)
-			$mask = '(?:'.Filename::DRIVE.'?)[/\\\\]';
+			$mask = '(?:'.Filename::DRIVE.')?[/\\\\]';
 
-		$mask .= '(?:'.Filename::NAME.'[/\\\\])+';
+		$mask .= '(?:'.Filename::NAME.'[/\\\\])*';
 
 		if ($type & 2)
 			$mask .= FileName::NAME;
-		
+
 		parent::__construct('`^'.$mask.'$`');
 	}
 }

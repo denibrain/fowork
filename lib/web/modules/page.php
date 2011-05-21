@@ -80,6 +80,7 @@ class Page extends FW\App\Module {
 		
 		$app = $this->app;
 		$template = new \FW\Text\ParametricTemplate();
+
 		$template->setText(
 			$templateText,
 			function($field, $value) use ($app, $h) {
@@ -106,7 +107,7 @@ class Page extends FW\App\Module {
 			case 'tablename': return $this->tablename;
 			case 'caption': return $this->caption;
 			case 'url': return $this->url;
-			case 'title': return implode(" - ", $this->path);
+			case 'title': return implode(" - ", array_reverse($this->path));
 			case 'id': return $this->id;
 			default: return parent::__get($key);
 		}
@@ -158,30 +159,27 @@ class Page extends FW\App\Module {
 				list($valueurl, $params) = $urls[$id];
 				$this->path[$valueurl] = $this->app->resolve($expression == '*' ? "{"."$page}" : $expression, $params);
 			}
+		} else {
+			$this->parentIds = array();
 		}
+
 			
 		$this->path[(string)$this->url] = $this->caption;
 		$this->path2[$this->id] = array((string)$this->url, $this->params);
 	}
 	
-	function outtree(&$path, &$tree, $e) {
-		if (count($path))
-		foreach ($path as $key => $value) {
-			$a = $e->add(E(array('id'=>$key)));
-			list($a->caption, $a->href, $selected) = $value;
-			if ($selected) $a->selected = 1;
-			if(isset($tree[$key]) && count($tree[$key])) $this->outtree($tree[$key], $tree, $a);
-		}
-	}
-
 	function getMap($startUrl = '', $onlyActive = false, $onmenu = false) {
-		$params['startUrl'] = $startUrl;
+		$params = array();
+		if ($startUrl) 
+			$params['startUrl'] = $startUrl;
+		else
+			$params['exclude'] = '';
 		if ($onlyActive) {
 			$params['parents'] = $this->parentIds;
-			if ($startUrl) $params['parents'][] = '';
+			//if ($startUrl) $params['parents'][] = '';
 			$params['parents'][] = $this->id;
 		}
-		$ds->where = "parent_id = ANY (:parents)";
+		//	$ds->where = "parent_id = ANY (:parents)";
 		if ($onmenu) $params['onmenu'] = true;
 
 		//$params['aclevels'] = App::$_->user->groups;
@@ -194,7 +192,7 @@ class Page extends FW\App\Module {
 			if ('*' !== $name) {
 				/* static page */
 				foreach($nodes[$parent] as $nodeurl => $params) {
-					$realid = "$nodeurl.$name";
+					$realid = ($nodeurl?"$nodeurl.":'').$name;
 					$h= !$href ? $realid : $href;
 					array_unshift($params, $name);
 					$selected = isset($this->path[$realid]);
@@ -212,7 +210,7 @@ class Page extends FW\App\Module {
 					foreach($nodes[$parent] as $nodeurl => $params) {
 						$map = $this->app->call($mapex, $params, 'map');
 						foreach($map as $key=>$caption) {
-							$realid = "$nodeurl.$key";
+							$realid = ($nodeurl?"$nodeurl.":'').$key;
 							$tree[$nodeurl][$realid] = array(
 								$caption, $realid, $selected = isset($this->path[$realid])
 							);
@@ -251,8 +249,6 @@ class Page extends FW\App\Module {
 			}
 		}
 		
-//		print_r($list);
-//		$this->outtree($tree[$startUrl], $tree, $root);
 		return $root;
 	}
 	

@@ -1,0 +1,11 @@
+AJAX protocol
+
+request
+	string URL - cmd.X.X.X.X
+	string[] POST data
+
+response
+	string status: ok/error
+	string error: message of error
+	string[] content
+		key - id of content
