@@ -21,29 +21,34 @@ class User extends \FW\Web\Module {
 		if (isset($_COOKIE['SUID']) &&
 			$session = $this->dsSession(A('id', (int)$_COOKIE['SUID']))->getA())
 		{
-			if (!$session) throw new EInvalidSession();
+			try {
+				if (!$session) throw new EInvalidSession();
 
-			$this->SUID = (int)$_COOKIE['SUID'];
-			if ($session['ip']!=$_SERVER['REMOTE_ADDR']) throw new EInvalidSession();
-			if ($session['diff'] > 3600) throw new ESessionExpired();
-			if (!$session['active']) throw new ESessionStopped();
+				$this->SUID = (int)$_COOKIE['SUID'];
+				if ($session['ip']!=$_SERVER['REMOTE_ADDR']) throw new EInvalidSession();
+				if ($session['diff'] > 3600) throw new ESessionExpired();
+				if (!$session['active']) throw new ESessionStopped();
+				$this->id = $session['userid'];
+
+				$this->type = $session['type'];
+				$this->name = $session['name'];
+				$this->loadGroups();
+				$this->dpProlongate($this->SUID);
+				setcookie('SUID', $this->SUID, time() + 3600);
+				
+				return;
+			}
+			catch (Exception $e) {
+				$this->stopSession();
+			}
 			
-			$this->id = $session['userid'];
-
-			$this->type = $session['type'];
-			$this->name = $session['name'];
-			$this->loadGroups();
-			$this->dpProlongate($this->SUID);
-			setcookie('SUID', $this->SUID, time() + 3600);
 		}
-		else {
-			$this->id = 0;
-			$this->type = 'guest';
-			$this->name = 'Гость';
-			$this->groups = array('guest');
-			if (isset($_COOKIE['SUID']))
-				setcookie('SUID', $_COOKIE['SUID'], time() - 3600);
-		}
+		$this->id = 0;
+		$this->type = 'guest';
+		$this->name = 'Гость';
+		$this->groups = array('guest');
+		if (isset($_COOKIE['SUID']))
+			setcookie('SUID', $_COOKIE['SUID'], time() - 3600);
 	}
 
 	function __get($key) {
