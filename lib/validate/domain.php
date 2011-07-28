@@ -12,7 +12,7 @@ class Domain extends Validator {
 	private $type;
 
 	static function init() {
-		Domain::$Mask = new Mask('/^(?:xn--)?[a-z0-9](?:-?[a-z0-9])*$/i');		
+		Domain::$Mask = new Mask('/^(?:xn--(?:[a-z0-9-]+-)?)?[a-z0-9](?:-?[a-z0-9])*$/i');		
 	}
 
 	function __construct($maxLevel = 0, $type = Domain::ANY) {
@@ -53,3 +53,5 @@ class Domain extends Validator {
 }
 
 Domain::init();
+
+
