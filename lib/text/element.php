@@ -175,6 +175,7 @@ class Element extends \FW\Object {
 
 	private function importNode($node) {
 		if (isset($node['@attributes'])) {
+            foreach($node['@attributes'] as &$n) $n = iconv('utf-8', FW_CHARSET, $n);
 			$this->add($node['@attributes']);
 			unset($node['@attributes']);
 		}

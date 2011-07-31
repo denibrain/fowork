@@ -132,10 +132,11 @@ class DB extends \FW\Object {
 		$parameters = func_get_args();
 		if (!count($parameters)) throw new EDB('Too few parametrs');
 		$format = array_shift($parameters);
-		$parameters['~@'] = $this->prefix;
+		// $parameters['~@'] = $this->prefix;
 		$n = 0; $self = $this;
 		return preg_replace_callback(array('/:(\?|#([0-9]+))/', '/(~@)/'),
 			function ($regs) use ($parameters, &$n, $self) {
+				if ($regs[1] == '~@') return $self->prefix;
 				if ($regs[1] == '?') {
 					$regs[1] = $n;
 					++$n;

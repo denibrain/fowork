@@ -64,7 +64,7 @@ class MySQLQuery extends Query {
 	function __construct(MySQL $db, $query) {
         parent::__construct($db, $query);
 		if (false===($this->handle = mysql_query($query, $db->handle))) {
-            throw new EMySQL($this->db->handle, $query);
+			throw new EMySQL($this->db->handle, $query);
 		}
 	}
 	
