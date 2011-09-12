@@ -8,21 +8,21 @@ class Element extends \FW\Object {
 	private $parentNode = NULL;
 	private $rootNode = NULL;
 	private $items = array();
-	
+
 	private $last;
-	
+
 	function __construct() {
 		if (!$args = func_get_args()) return;
 		$this->addItems($args);
 		$this->rootNode = $this;
 	}
-	
+
 	private function addAttrs($attr) {
 		foreach($attr as $key => $value) {
 			$this->items[$key] = $value;
 		}
 	}
-	
+
 	private function addItem($e) {
 		$this->last = $e;
 		if (!isset($this->items[$e->tagName]))
@@ -61,7 +61,7 @@ class Element extends \FW\Object {
 				else $this->items[$key] = $value;
 		}
 	}
-	
+
 	function __get($key) {
 		switch($key) {
 			case 'items': return $this->items;
@@ -151,7 +151,7 @@ class Element extends \FW\Object {
 	function embedObject($obj) {
 		foreach(get_object_vars($obj) as $key=>$prop) $this->addNamedItem ($key, $prop);
 	}
-	
+
 	function asXML() {
 		$tag = "<{$this->tagName}";
 		$body = '';
@@ -160,7 +160,7 @@ class Element extends \FW\Object {
 				$body .= $item->asXML();
 			else
 				$tag .= " $key='".T((string)$item)->attr()."'";
-				
+
 		$tag .= $body?">$body</{$this->tagName}>":"/>";
 		return $tag;
 	}
@@ -181,8 +181,13 @@ class Element extends \FW\Object {
 		}
 		foreach($node as $tag => $body) {
 			if (!is_array($body)) $body = array($body);
-			foreach($body as $item)
-				$this->add(E($tag))->importNode(\get_object_vars ($item));
+			foreach($body as $item) {
+				if (is_string($item)) {
+					echo "$tag: $item\n";
+				} else
+					$this->add(E($tag))->importNode(\get_object_vars ($item));
+			}
+
 		}
 	}
 
@@ -203,7 +208,7 @@ class Element extends \FW\Object {
 		array_walk($loc, array($this, 'aItem'));
 		return $loc;
 	}
-	
+
 	function asJSON() {
 		return json_encode($this->toArray($this));
 	}
@@ -224,5 +229,5 @@ class Element extends \FW\Object {
 		$e = is_string($groupName) ? new Element($groupName) : $groupName;
 		foreach($dic as $id => $name) $e->add(new Element($itemName, array('id'=>$id, 'name'=>$name)));
 		return $e;
-	}	
+	}
 }
